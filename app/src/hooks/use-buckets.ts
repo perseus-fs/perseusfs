@@ -1,39 +1,43 @@
 import { getApiUrl } from '@/helpers/get-api-url';
-import { useCallback, useEffect, useState } from 'react';
+import { DEFAULT_QUERY_CACHE } from '@/statics';
+import { useQuery } from '@tanstack/react-query';
 import { useToken } from './use-token';
 
+const fetchBuckets = async (token: string | undefined) => {
+  if (!token) throw new Error('No token provided');
+
+  const response = await fetch(`${getApiUrl()}/buckets`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch buckets');
+  }
+
+  const data = await response.json();
+  return data.buckets;
+};
+
 const useBuckets = () => {
-  const [loading, setLoading] = useState(false);
-  const [buckets, setBuckets] = useState<any[]>([]);
   const token = useToken();
 
-  const loadBuckets = useCallback(async () => {
-    setLoading(true);
+  const {
+    data: buckets = [],
+    isLoading,
+    isError,
+    refetch
+  } = useQuery({
+    queryKey: ['buckets'],
+    queryFn: () => fetchBuckets(token),
+    enabled: !!token,
+    staleTime: DEFAULT_QUERY_CACHE
+  });
 
-    const response = await fetch(`${getApiUrl()}/buckets`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    setLoading(false);
-
-    if (!response.ok) {
-      return;
-    }
-
-    const data = await response.json();
-
-    setBuckets(data.buckets);
-  }, [token]);
-
-  useEffect(() => {
-    loadBuckets();
-  }, [loadBuckets]);
-
-  return { loading, buckets, refetch: loadBuckets };
+  return { loading: isLoading, buckets, isError, refetch };
 };
 
 export { useBuckets };

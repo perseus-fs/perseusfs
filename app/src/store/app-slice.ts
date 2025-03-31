@@ -2,12 +2,10 @@ import { createSlice } from '@reduxjs/toolkit';
 
 export interface IAppState {
   currentTime: number;
-  updateSidebarCount: number;
 }
 
 const initialState: IAppState = {
-  currentTime: 0,
-  updateSidebarCount: 0
+  currentTime: 0
 };
 
 export const appSlice = createSlice({
@@ -16,9 +14,6 @@ export const appSlice = createSlice({
   reducers: {
     setCurrentTime: (state, action) => {
       state.currentTime = action.payload;
-    },
-    incrementUpdateSidebarCount: (state) => {
-      state.updateSidebarCount += 1;
     }
   }
 });

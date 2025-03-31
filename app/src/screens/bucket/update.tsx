@@ -1,4 +1,4 @@
-import { updateSidebar } from '@/actions/app';
+import { invalidateBucket } from '@/actions/app';
 import { BucketCrud } from '@/components/bucket-crud';
 import { getApiUrl } from '@/helpers/get-api-url';
 import { useToken } from '@/hooks/use-token';
@@ -43,10 +43,10 @@ const UpdateBucket = memo(() => {
         return errors;
       }
 
-      updateSidebar();
-      toast.success('Bucket updated successfully');
+      toast.success('Bucket created successfully');
+      invalidateBucket(bucketId!);
     },
-    [token, id]
+    [token, id, bucketId]
   );
 
   return (

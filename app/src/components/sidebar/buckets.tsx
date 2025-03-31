@@ -1,8 +1,6 @@
 import { useBuckets } from '@/hooks/use-buckets';
-import { useSelectFirstBucket } from '@/hooks/use-select-first-bucket';
-import { useSidebarCount } from '@/hooks/use-sidebar-count';
 import { FolderOpen, Plus } from 'lucide-react';
-import { memo, useEffect } from 'react';
+import { memo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { AdminOnly } from '../admin-only';
 import { Button } from '../ui/button';
@@ -16,19 +14,9 @@ import {
 } from '../ui/sidebar';
 
 const Buckets = memo(() => {
-  const { buckets, refetch } = useBuckets();
+  const { buckets } = useBuckets();
   const navigate = useNavigate();
   const location = useLocation();
-  const count = useSidebarCount();
-
-  useSelectFirstBucket(buckets);
-
-  // I know this fucking sucks, but I don't care.
-  useEffect(() => {
-    if (count === 0) return;
-
-    refetch();
-  }, [count, refetch]);
 
   return (
     <SidebarGroup>

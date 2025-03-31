@@ -1,4 +1,3 @@
-import { updateSidebar } from '@/actions/app';
 import { openDialog, requestConfirmation } from '@/actions/dialog';
 import { Dialog } from '@/components/dialogs';
 import { LoadingSection } from '@/components/loading-section';
@@ -61,7 +60,6 @@ const Header = memo(
 
       if (response.ok) {
         navigate('/');
-        updateSidebar();
       }
     }, [bucket.name, bucket.id, token, navigate]);
 

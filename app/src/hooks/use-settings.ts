@@ -1,40 +1,43 @@
 import { getApiUrl } from '@/helpers/get-api-url';
-import { TSettings } from '@perseusfs/shared';
-import { useCallback, useEffect, useState } from 'react';
+import { DEFAULT_QUERY_CACHE } from '@/statics';
+import { useQuery } from '@tanstack/react-query';
 import { useToken } from './use-token';
 
+const fetchSettings = async (token: string | undefined) => {
+  if (!token) throw new Error('No token provided');
+
+  const response = await fetch(`${getApiUrl()}/settings`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch settings');
+  }
+
+  const { settings } = await response.json();
+  return settings;
+};
+
 const useSettings = () => {
-  const [loading, setLoading] = useState(false);
-  const [settings, setSettings] = useState<TSettings | undefined>();
   const token = useToken();
 
-  const loadSettings = useCallback(async () => {
-    setLoading(true);
+  const {
+    data: settings,
+    isLoading,
+    isError,
+    refetch
+  } = useQuery({
+    queryKey: ['settings'],
+    queryFn: () => fetchSettings(token),
+    enabled: !!token,
+    staleTime: DEFAULT_QUERY_CACHE
+  });
 
-    const response = await fetch(`${getApiUrl()}/settings`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    setLoading(false);
-
-    if (!response.ok) {
-      return;
-    }
-
-    const { settings } = await response.json();
-
-    setSettings(settings);
-  }, [token]);
-
-  useEffect(() => {
-    loadSettings();
-  }, [loadSettings]);
-
-  return { loading, settings, refetch: loadSettings };
+  return { loading: isLoading, settings, isError, refetch };
 };
 
 export { useSettings };

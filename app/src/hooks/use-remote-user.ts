@@ -1,40 +1,46 @@
 import { getApiUrl } from '@/helpers/get-api-url';
-import { TUser } from '@perseusfs/shared';
-import { useCallback, useEffect, useState } from 'react';
+import { DEFAULT_QUERY_CACHE } from '@/statics';
+import { useQuery } from '@tanstack/react-query';
 import { useToken } from './use-token';
 
+const fetchUser = async (
+  userId: number | undefined,
+  token: string | undefined
+) => {
+  if (!userId || !token) throw new Error('Invalid user ID or token');
+
+  const response = await fetch(`${getApiUrl()}/users/${userId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch user');
+  }
+
+  const data = await response.json();
+  return data.user;
+};
+
 const useRemoteUser = (userId: number | undefined) => {
-  const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<TUser | undefined>(undefined);
   const token = useToken();
 
-  const loadUser = useCallback(async () => {
-    if (!userId) return;
+  const {
+    data: user,
+    isLoading,
+    isError,
+    refetch
+  } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: () => fetchUser(userId, token),
+    enabled: !!userId && !!token,
+    staleTime: DEFAULT_QUERY_CACHE
+  });
 
-    setLoading(true);
-
-    const response = await fetch(`${getApiUrl()}/users/${userId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    setLoading(false);
-
-    if (!response.ok) return;
-
-    const data = await response.json();
-
-    setUser(data.user);
-  }, [token, userId]);
-
-  useEffect(() => {
-    loadUser();
-  }, [loadUser]);
-
-  return { loading, user, refetch: loadUser };
+  return { loading: isLoading, user, isError, refetch };
 };
 
 export { useRemoteUser };

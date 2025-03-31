@@ -1,10 +1,11 @@
-import { updateSidebar } from '@/actions/app';
+import { invalidateBuckets } from '@/actions/app';
 import { BucketCrud } from '@/components/bucket-crud';
 import { getApiUrl } from '@/helpers/get-api-url';
 import { useToken } from '@/hooks/use-token';
 import { TErrors, TZedBucket } from '@perseusfs/shared';
 import { memo, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 
 const CreateBucket = memo(() => {
   const navigate = useNavigate();
@@ -32,8 +33,9 @@ const CreateBucket = memo(() => {
         return errors;
       }
 
-      updateSidebar();
+      toast.success('Bucket created successfully');
       navigate('/buckets');
+      invalidateBuckets();
     },
     [token, navigate]
   );

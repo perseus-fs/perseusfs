@@ -29,3 +29,5 @@ export const CODE_WRITE_BOILERPLATE = `async (req, fileName, bucket) => {
 export const DATE_FORMAT = 'PPp P';
 
 export const DEFAULT_PAGE_SIZE = 25;
+
+export const DEFAULT_QUERY_CACHE = 1000 * 60 * 5; // 5 minutes

@@ -1,48 +1,54 @@
 import { getApiUrl } from '@/helpers/get-api-url';
-import {
-  DEFAULT_USER_PERMISSIONS,
-  TUserBucketPermissions
-} from '@perseusfs/shared';
-import { useCallback, useEffect, useState } from 'react';
+import { DEFAULT_QUERY_CACHE } from '@/statics';
+import { DEFAULT_USER_PERMISSIONS } from '@perseusfs/shared';
+import { useQuery } from '@tanstack/react-query';
 import { useToken } from './use-token';
 
+const fetchBucket = async (
+  bucketId: number | undefined,
+  token: string | undefined
+) => {
+  if (!bucketId || !token) throw new Error('Invalid bucket ID or token');
+
+  const response = await fetch(`${getApiUrl()}/buckets/${bucketId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch bucket');
+  }
+
+  const data = await response.json();
+
+  return {
+    files: data.files ?? [],
+    bucket: data.bucket ?? undefined,
+    userPermissions: data.userPermissions ?? DEFAULT_USER_PERMISSIONS
+  };
+};
+
 const useBucket = (bucketId: number | undefined) => {
-  const [loading, setLoading] = useState(false);
-  const [files, setFiles] = useState<any[]>([]);
-  const [bucket, setBucket] = useState<any>(undefined);
-  const [userPermissions, setUserPermissions] =
-    useState<TUserBucketPermissions>(DEFAULT_USER_PERMISSIONS);
   const token = useToken();
 
-  const loadBucket = useCallback(async () => {
-    if (!bucketId) return;
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ['bucket', bucketId],
+    queryFn: () => fetchBucket(bucketId, token),
+    enabled: !!bucketId && !!token,
+    staleTime: DEFAULT_QUERY_CACHE
+  });
 
-    setLoading(true);
-
-    const response = await fetch(`${getApiUrl()}/buckets/${bucketId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    setLoading(false);
-
-    if (!response.ok) return;
-
-    const data = await response.json();
-
-    setFiles(data.files ?? []);
-    setBucket(data.bucket ?? undefined);
-    setUserPermissions(data.userPermissions ?? DEFAULT_USER_PERMISSIONS);
-  }, [token, bucketId]);
-
-  useEffect(() => {
-    loadBucket();
-  }, [loadBucket]);
-
-  return { loading, files, bucket, userPermissions, refetch: loadBucket };
+  return {
+    loading: isLoading,
+    files: data?.files ?? [],
+    bucket: data?.bucket ?? undefined,
+    userPermissions: data?.userPermissions ?? DEFAULT_USER_PERMISSIONS,
+    isError,
+    refetch
+  };
 };
 
 export { useBucket };
