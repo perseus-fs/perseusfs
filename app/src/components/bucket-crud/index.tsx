@@ -9,6 +9,7 @@ import {
   TErrors,
   TZedBucket
 } from '@perseusfs/shared';
+import { filesize } from 'filesize';
 import { memo, useCallback, useMemo } from 'react';
 import { CodeEditor } from '../code-editor';
 import { Button } from '../ui/button';
@@ -202,17 +203,20 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
 
           {values.quotaPolicy === QuotaPolicy.LIMITED && (
             <Group
+              className="flex items-center gap-2"
               label="Quota amount"
               error={errors.quota}
-              description="In megabytes"
+              description="The maximum disk usage for this specific bucket in bytes."
               required
             >
               <Input
                 {...r('quota', true)}
                 type="number"
-                className="w-[100px]"
-                min={0}
+                className="w-[300px]"
               />
+              <span className="text-xs text-muted-foreground">
+                {filesize(values.quota ?? 0)}
+              </span>
             </Group>
           )}
 

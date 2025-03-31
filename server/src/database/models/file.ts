@@ -1,4 +1,5 @@
 import {
+  QuotaPolicy,
   SettingKey,
   validateObject,
   ZedFile,
@@ -54,6 +55,16 @@ class File {
     `;
 
     const { size } = db.query(sizeQuery).get() as { size: number };
+
+    return size;
+  }
+
+  public static getFilesSizeByBucketId(bucketId: number) {
+    const sizeQuery = `
+      SELECT SUM(size) as size FROM files WHERE bucketId = $bucketId
+    `;
+
+    const { size } = db.query(sizeQuery).get({ bucketId }) as { size: number };
 
     return size;
   }
@@ -200,6 +211,15 @@ class File {
 
       if (currentDiskUsage + data.byteLength > maxDiskUsage) {
         throw new Error('Disk usage limit exceeded');
+      }
+    }
+
+    if (bucket.quotaPolicy === QuotaPolicy.LIMITED) {
+      const currentDiskUsage = this.getFilesSizeByBucketId(bucketId);
+      const bucketQuota = bucket.quota ?? 0;
+
+      if (currentDiskUsage + data.byteLength > bucketQuota) {
+        throw new Error('Bucket quota exceeded');
       }
     }
 

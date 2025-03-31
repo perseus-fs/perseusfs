@@ -52,6 +52,17 @@ const loadMocks = () => {
       retention: null,
       retentionPolicy: RetentionPolicy.NEVER_DELETE
     }),
+    Bucket.create({
+      name: 'bucket-3',
+      customRead: null,
+      customWrite: null,
+      quota: 500000, // 500KB
+      quotaPolicy: QuotaPolicy.LIMITED,
+      read: IOPermission.PUBLIC,
+      write: IOPermission.PUBLIC,
+      retention: null,
+      retentionPolicy: RetentionPolicy.NEVER_DELETE
+    }),
     // --------------- PERMISSIONS
     BucketPermission.create({
       userId: 2,

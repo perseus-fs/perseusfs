@@ -155,4 +155,20 @@ test('Tries to upload file that exceeds global max disk usage', async () => {
   expect(response.status).toBe(500);
 });
 
+test('Tries to upload file that exceeds bucket disk usage', async () => {
+  const response = await fetch(`${TestContext.baseUrl}/upload`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      [FileHeader.FILENAME]: 'too-big.txt',
+      [FileHeader.BUCKET_ID]: '3',
+      Authorization: `Bearer ${TestContext.loginTokens[1]}`
+    },
+    body: TestContext.getStringAsArrayBuffer(2000000) // 2MB
+  });
+
+  expect(response.ok).toBe(false);
+  expect(response.status).toBe(500);
+});
+
 // add custom read & write permissions tests
