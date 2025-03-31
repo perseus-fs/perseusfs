@@ -1,0 +1,109 @@
+import { DEFAULT_USER_PERMISSIONS, IOPermission } from '@perseusfs/shared';
+import path from 'path';
+import { Bucket } from '../../database/models/bucket';
+import { File } from '../../database/models/file';
+import { getResponseHeaders } from '../../helpers/get-response-headers';
+import { getUserFromToken } from '../../helpers/get-user-from-token';
+import type { TCustomRequest } from '../../types';
+
+const getFile = async (req: TCustomRequest) => {
+  const url = new URL(req.url);
+  const urlParts = url.pathname.split('/').filter(Boolean);
+  const token = req.headers.get('Authorization')?.replace('Bearer ', '');
+
+  if (urlParts.length < 2) {
+    return new Response('Not found', {
+      status: 404,
+      headers: getResponseHeaders()
+    });
+  }
+
+  const { bucketKey } = req.params;
+  const fileKey = decodeURIComponent(urlParts.at(-1) ?? '');
+  const bucket = Bucket.findByName(bucketKey);
+
+  if (!bucket || !fileKey) {
+    return new Response('Not found', {
+      status: 404,
+      headers: getResponseHeaders()
+    });
+  }
+
+  const dbFile = File.findByBucketAndKey(bucket.id, fileKey);
+
+  if (!dbFile) {
+    return new Response('Not found', {
+      status: 404,
+      headers: getResponseHeaders()
+    });
+  }
+
+  const filePath = path.resolve(
+    Bucket.getPath(bucketKey),
+    dbFile.path ?? '',
+    fileKey
+  );
+
+  const file = Bun.file(filePath);
+
+  if (!(await file.exists())) {
+    return new Response('Not found', {
+      status: 404,
+      headers: getResponseHeaders()
+    });
+  }
+
+  if (bucket.read !== IOPermission.PUBLIC) {
+    const user = getUserFromToken(token);
+
+    if (bucket.read === IOPermission.PRIVATE) {
+      if (!user) {
+        return new Response('Unauthorized', {
+          status: 401,
+          headers: getResponseHeaders()
+        });
+      }
+
+      const { readPermission } =
+        user.getBucketPermissions(bucket.id) ?? DEFAULT_USER_PERMISSIONS;
+
+      if (!readPermission) {
+        return new Response('Forbidden', {
+          status: 403,
+          headers: getResponseHeaders()
+        });
+      }
+    } else if (bucket.read === IOPermission.CUSTOM) {
+      req.user = user;
+
+      try {
+        if (bucket.customRead) {
+          const fn = eval(bucket.customRead);
+          const customFnResult = await fn(req, dbFile, bucket);
+
+          if (!customFnResult) {
+            return new Response('Forbidden', {
+              status: 403,
+              headers: getResponseHeaders()
+            });
+          }
+        }
+      } catch {
+        return new Response('Internal Server Error', {
+          status: 500,
+          headers: getResponseHeaders()
+        });
+      }
+    }
+  }
+
+  return new Response(file, {
+    headers: {
+      ...getResponseHeaders(),
+      'Cache-Control': 'no-cache',
+      'Content-Type': dbFile?.contentType ?? 'application/octet-stream'
+    }
+  });
+};
+
+export { getFile };

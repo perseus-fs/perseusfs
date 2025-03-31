@@ -1,0 +1,19 @@
+{
+  "name": "perseusfs",
+  "version": "0.0.0",
+  "scripts": {
+    "build": "bun --bun ./scripts/build.ts"
+  },
+  "workspaces": [
+    "server",
+    "app",
+    "shared",
+    "scripts"
+  ],
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@perseusfs/scripts",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/semver": "^7.5.8",
+    "@types/archiver": "^6.0.3",
+    "@types/adm-zip": "^0.5.7"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@perseusfs/shared": "workspace:*",
+    "adm-zip": "^0.5.16",
+    "archiver": "^7.0.1",
+    "semver": "^7.7.1"
+  }
+}

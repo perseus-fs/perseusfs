@@ -1,0 +1,44 @@
+import { updateSidebar } from '@/actions/app';
+import { BucketCrud } from '@/components/bucket-crud';
+import { getApiUrl } from '@/helpers/get-api-url';
+import { useToken } from '@/hooks/use-token';
+import { TErrors, TZedBucket } from '@perseusfs/shared';
+import { memo, useCallback, useState } from 'react';
+import { useNavigate } from 'react-router';
+
+const CreateBucket = memo(() => {
+  const navigate = useNavigate();
+  const token = useToken();
+  const [loading, setLoading] = useState(false);
+
+  const onSubmit = useCallback(
+    async (values: Partial<TZedBucket>): Promise<TErrors | undefined> => {
+      setLoading(true);
+
+      const res = await fetch(`${getApiUrl()}/buckets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(values)
+      });
+
+      setLoading(false);
+
+      if (!res.ok) {
+        const { errors } = await res.json();
+
+        return errors;
+      }
+
+      updateSidebar();
+      navigate('/buckets');
+    },
+    [token, navigate]
+  );
+
+  return <BucketCrud onSubmit={onSubmit} loading={loading} />;
+});
+
+export { CreateBucket };
