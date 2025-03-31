@@ -216,15 +216,16 @@ class Bucket implements TBucket {
       .as(Bucket);
 
     query.run({
-      name: newData.name!,
-      read: newData.read!,
-      write: newData.write!,
-      quota: newData.quota!,
-      customRead: newData.customRead!,
-      customWrite: newData.customWrite!,
-      retention: newData.retention!,
-      quotaPolicy: newData.quotaPolicy!,
-      retentionPolicy: newData.retentionPolicy!,
+      name: newData.name ?? existingBucket.name,
+      read: newData.read ?? existingBucket.read,
+      write: newData.write ?? existingBucket.write,
+      quota: newData.quota ?? existingBucket.quota,
+      customRead: newData.customRead ?? existingBucket.customRead,
+      customWrite: newData.customWrite ?? existingBucket.customWrite,
+      retention: newData.retention ?? existingBucket.retention,
+      quotaPolicy: newData.quotaPolicy ?? existingBucket.quotaPolicy,
+      retentionPolicy:
+        newData.retentionPolicy ?? existingBucket.retentionPolicy,
       id: bucketId,
       updatedAt: Date.now()
     });
