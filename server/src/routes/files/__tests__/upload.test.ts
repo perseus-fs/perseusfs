@@ -1,6 +1,7 @@
-import { FileHeader, SettingKey } from '@perseusfs/shared';
+import { FileHeader, IOPermission, SettingKey } from '@perseusfs/shared';
 import { expect, test } from 'bun:test';
 import { TestContext } from '../../../__tests__/context';
+import { Bucket } from '../../../database/models/bucket';
 import { Settings } from '../../../database/models/settings';
 
 const MOCK_FILE = TestContext.getStringAsArrayBuffer(5000); // 5KB
@@ -171,4 +172,180 @@ test('Tries to upload file that exceeds bucket disk usage', async () => {
   expect(response.status).toBe(500);
 });
 
-// add custom read & write permissions tests
+test('Tries to upload file and fails with simple custom write permissions that returns false', async () => {
+  Bucket.update(3, {
+    write: IOPermission.CUSTOM,
+    customWrite: `async (req, fileName, bucket) => {
+      return false;
+    }`
+  });
+
+  const response = await fetch(`${TestContext.baseUrl}/upload`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      [FileHeader.FILENAME]: 'test.txt',
+      [FileHeader.BUCKET_ID]: '3',
+      Authorization: `Bearer ${TestContext.loginTokens[1]}`
+    },
+    body: MOCK_FILE
+  });
+
+  expect(response.ok).toBe(false);
+  expect(response.status).toBe(403);
+});
+
+test('Tries to upload file and succeeds with simple custom write permissions that returns true', async () => {
+  Bucket.update(3, {
+    write: IOPermission.CUSTOM,
+    customWrite: `async (req, fileName, bucket) => {
+      return true;
+    }`
+  });
+
+  const response = await fetch(`${TestContext.baseUrl}/upload`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      [FileHeader.FILENAME]: 'test.txt',
+      [FileHeader.BUCKET_ID]: '3',
+      Authorization: `Bearer ${TestContext.loginTokens[1]}`
+    },
+    body: MOCK_FILE
+  });
+
+  expect(response.ok).toBe(true);
+  expect(response.status).toBe(200);
+});
+
+test('Custom write permissions: checks header value', async () => {
+  Bucket.update(3, {
+    write: IOPermission.CUSTOM,
+    customWrite: `async (req, fileName, bucket) => {
+      const testHeader = req.headers.get('X-Test-Header');
+
+      if(testHeader === 'my-value') {
+        return true;
+      }
+
+      return false;
+    }`
+  });
+
+  const response = await fetch(`${TestContext.baseUrl}/upload`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      [FileHeader.FILENAME]: 'test.txt',
+      [FileHeader.BUCKET_ID]: '3',
+      Authorization: `Bearer ${TestContext.loginTokens[1]}`,
+      'X-Test-Header': 'my-value'
+    },
+    body: MOCK_FILE
+  });
+
+  expect(response.ok).toBe(true);
+  expect(response.status).toBe(200);
+});
+
+test('Custom write permissions: checks file name', async () => {
+  Bucket.update(3, {
+    write: IOPermission.CUSTOM,
+    customWrite: `async (req, fileName, bucket) => {
+      if(fileName === 'test.txt') {
+        return true;
+      }
+
+      return false;
+    }`
+  });
+
+  const response = await fetch(`${TestContext.baseUrl}/upload`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      [FileHeader.FILENAME]: 'heyyyyyy.txt',
+      [FileHeader.BUCKET_ID]: '3',
+      Authorization: `Bearer ${TestContext.loginTokens[1]}`
+    },
+    body: MOCK_FILE
+  });
+
+  expect(response.ok).toBe(false);
+  expect(response.status).toBe(403);
+});
+
+test('Custom write permissions: do not allow if bucket is called tasbemmene', async () => {
+  Bucket.update(3, {
+    name: 'tasbemmene',
+    write: IOPermission.CUSTOM,
+    customWrite: `async (req, fileName, bucket) => {
+      if(bucket.name === 'tasbemmene') {
+        return false;
+      }
+
+      return false;
+    }`
+  });
+
+  const response = await fetch(`${TestContext.baseUrl}/upload`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      [FileHeader.FILENAME]: 'heyyyyyy.txt',
+      [FileHeader.BUCKET_ID]: '3',
+      Authorization: `Bearer ${TestContext.loginTokens[1]}`
+    },
+    body: MOCK_FILE
+  });
+
+  expect(response.ok).toBe(false);
+  expect(response.status).toBe(403);
+});
+
+test('Custom write permissions: allow if user is logged in', async () => {
+  Bucket.update(3, {
+    name: 'tasbemmene',
+    write: IOPermission.CUSTOM,
+    customWrite: `async (req, fileName, bucket) => {
+      return !!req.user;
+    }`
+  });
+
+  const response = await fetch(`${TestContext.baseUrl}/upload`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      [FileHeader.FILENAME]: 'heyyyyyy.txt',
+      [FileHeader.BUCKET_ID]: '3',
+      Authorization: `Bearer ${TestContext.loginTokens[1]}`
+    },
+    body: MOCK_FILE
+  });
+
+  expect(response.ok).toBe(true);
+  expect(response.status).toBe(200);
+});
+
+test('Custom write permissions: block if user is not logged in', async () => {
+  Bucket.update(3, {
+    name: 'tasbemmene',
+    write: IOPermission.CUSTOM,
+    customWrite: `async (req, fileName, bucket) => {
+      return !!req.user;
+    }`
+  });
+
+  const response = await fetch(`${TestContext.baseUrl}/upload`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      [FileHeader.FILENAME]: 'heyyyyyy.txt',
+      [FileHeader.BUCKET_ID]: '3'
+    },
+    body: MOCK_FILE
+  });
+
+  expect(response.ok).toBe(false);
+  expect(response.status).toBe(403);
+});
