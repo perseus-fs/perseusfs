@@ -47,13 +47,14 @@ const handleRoute = async (
       status: 500,
       headers: getResponseHeaders()
     });
-  } catch (error) {
-    console.error(error);
-
-    return new Response(JSON.stringify({ error: 'Something went wrong.' }), {
-      status: 500,
-      headers: getResponseHeaders()
-    });
+  } catch (error: any) {
+    return new Response(
+      JSON.stringify({ error: error?.toString?.() ?? 'Something went wrong.' }),
+      {
+        status: 500,
+        headers: getResponseHeaders()
+      }
+    );
   }
 };
 

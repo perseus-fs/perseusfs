@@ -145,10 +145,10 @@ const UploadFileDialog = memo(
 
           onUploadSuccessDebounced();
         } else {
-          const { errors } = await response.json();
+          const { errors, error } = await response.json();
 
           newStatus = 'error';
-          fileErrors = errors;
+          fileErrors = errors || [error];
         }
 
         updateFile(fileToUpload.id, {
@@ -205,6 +205,8 @@ const UploadFileDialog = memo(
       },
       [prepareFiles]
     );
+
+    console.log('files', files);
 
     return (
       <Dialog {...dialogProps}>

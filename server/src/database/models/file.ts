@@ -1,4 +1,9 @@
-import { validateObject, ZedFile, type TUser } from '@perseusfs/shared';
+import {
+  SettingKey,
+  validateObject,
+  ZedFile,
+  type TUser
+} from '@perseusfs/shared';
 import { parse } from 'file-type-mime';
 import fs from 'fs';
 import path from 'path';
@@ -7,6 +12,7 @@ import { getFileHash } from '../../helpers/get-file-hash';
 import type { TCreateResponse } from '../../types';
 import { db } from '../db';
 import { Bucket } from './bucket';
+import { Settings } from './settings';
 
 class File {
   public id!: number;
@@ -176,16 +182,26 @@ class File {
     bucketId: number,
     uploadedBy: number | undefined,
     filePath: string
-  ):
-    | {
-        finalPath: string;
-        fileName: string;
-        fileId: number | bigint;
-      }
-    | undefined {
+  ): {
+    finalPath: string;
+    fileName: string;
+    fileId: number | bigint;
+  } {
     const bucket = Bucket.findById(bucketId);
 
-    if (!bucket) return undefined;
+    if (!bucket) {
+      throw new Error('Bucket not found');
+    }
+
+    const maxDiskUsage = Settings.get(SettingKey.MAX_DISK_USAGE);
+
+    if (maxDiskUsage > 0) {
+      const currentDiskUsage = this.getFilesSize();
+
+      if (currentDiskUsage + data.byteLength > maxDiskUsage) {
+        throw new Error('Disk usage limit exceeded');
+      }
+    }
 
     const extension = path.extname(filePath);
     const originalName = path.basename(filePath);
@@ -220,7 +236,7 @@ class File {
     });
 
     if (!fileId) {
-      return undefined;
+      throw new Error('Failed to create file record in database');
     }
 
     fs.writeFileSync(absolutePath, Buffer.from(data));
@@ -297,6 +313,18 @@ class File {
     }
 
     return true;
+  }
+
+  public getDiskUsage() {
+    const query = db.query(
+      'SELECT SUM(size) as size FROM files WHERE bucketId = $bucketId'
+    );
+
+    const { size } = query.get({ bucketId: this.bucketId }) as {
+      size: number;
+    };
+
+    return size;
   }
 
   public toJSON() {

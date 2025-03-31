@@ -139,14 +139,11 @@ class TestContext {
   }
 
   public getStringAsArrayBuffer(length: number): ArrayBuffer {
-    const array = new Uint8Array(length);
-    const string = String.fromCharCode.apply(null, Array.from(array));
-
     const arrayBuffer = new ArrayBuffer(length);
     const view = new Uint8Array(arrayBuffer);
 
     for (let i = 0; i < length; i++) {
-      view[i] = string.charCodeAt(i);
+      view[i] = 0; // Fill with null characters (char code 0)
     }
 
     return arrayBuffer;
