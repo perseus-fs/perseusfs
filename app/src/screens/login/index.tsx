@@ -20,30 +20,35 @@ const Login = memo(() => {
   const [values, setValues] = useState({ username: '', password: '' });
   const [errors, setErrors] = useState<TErrors>({});
 
-  const onSubmit = useCallback(async () => {
-    setLoading(true);
+  const onSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setLoading(true);
 
-    const response = await fetch(`${getApiUrl()}/users/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(values)
-    });
+      const response = await fetch(`${getApiUrl()}/users/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(values)
+      });
 
-    setLoading(false);
+      setLoading(false);
 
-    if (!response.ok) {
-      const data = await response.json();
-      setErrors(data.errors);
-      return;
-    }
+      if (!response.ok) {
+        const data = await response.json();
 
-    const { token } = await response.json();
+        setErrors(data.errors);
+        return;
+      }
 
-    setToken(token);
-    navigate('/');
-  }, [navigate, values]);
+      const { token } = await response.json();
+
+      setToken(token);
+      navigate('/');
+    },
+    [navigate, values]
+  );
 
   return (
     <div className="flex w-full items-center justify-center min-h-screen">
@@ -55,10 +60,10 @@ const Login = memo(() => {
           <CardDescription className="text-center">Login</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col gap-2 mt-2">
+          <form className="flex flex-col gap-2 mt-2" onSubmit={onSubmit}>
             <Group
               label="Username"
-              error={errors.email}
+              error={errors.username}
               required
               className="w-full"
             >
@@ -86,10 +91,10 @@ const Login = memo(() => {
               />
             </Group>
 
-            <Button disabled={loading} onClick={onSubmit}>
+            <Button disabled={loading} type="submit">
               Login
             </Button>
-          </div>
+          </form>
 
           <div className="flex gap-2 items-center justify-center mt-2">
             <span className="text-xs text-primary/60">
