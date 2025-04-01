@@ -4,6 +4,7 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 import version from 'vite-plugin-package-version';
+import svgr from 'vite-plugin-svgr';
 import webfontDownload from 'vite-plugin-webfont-dl';
 
 export default defineConfig(() => {
@@ -19,7 +20,7 @@ export default defineConfig(() => {
 
   return {
     base: isProduction ? '/_' : undefined,
-    plugins: [react(), webfontDownload(), viteCompression(), version()],
+    plugins: [react(), webfontDownload(), viteCompression(), version(), svgr()],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src')
