@@ -26,7 +26,7 @@ export const CODE_WRITE_BOILERPLATE = `async (req, fileName, bucket) => {
 };
 `;
 
-export const DATE_FORMAT = 'PPp P';
+export const DATE_FORMAT = 'PPp';
 
 export const DEFAULT_PAGE_SIZE = 25;
 

@@ -37,7 +37,7 @@ const PerPage = memo(({ perPage, setPerPage }: TPerPageProps) => {
         </Select>
       </div>
 
-      <span className='text-sm'>per page</span>
+      <span className="text-sm">per page</span>
     </div>
   );
 });

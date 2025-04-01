@@ -1,4 +1,5 @@
-import { requestConfirmation } from '@/actions/dialog';
+import { openDialog, requestConfirmation } from '@/actions/dialog';
+import { Dialog } from '@/components/dialogs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -23,7 +24,7 @@ import { getApiUrl } from '@/helpers/get-api-url';
 import { getFileUrl } from '@/helpers/get-file-url';
 import { useToken } from '@/hooks/use-token';
 import { DATE_FORMAT } from '@/statics';
-import { TBucket, TFile } from '@perseusfs/shared';
+import { IOPermission, TBucket, TFile } from '@perseusfs/shared';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -198,6 +199,17 @@ export const columns: ColumnDef<TFile>[] = [
         toast('Direct link copied to clipboard.');
       };
 
+      const onShareClick = () => {
+        openDialog(Dialog.SHARE_FILE, {
+          file,
+          bucket
+        });
+      };
+
+      const canGenerateDirectLink =
+        bucket.read === IOPermission.PUBLIC ||
+        bucket.read === IOPermission.CUSTOM;
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -211,7 +223,11 @@ export const columns: ColumnDef<TFile>[] = [
             <DropdownMenuItem onClick={onDownloadClick}>
               Download
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={onCopyDirectLinkClick}>
+            <DropdownMenuItem onClick={onShareClick}>Share</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={onCopyDirectLinkClick}
+              disabled={!canGenerateDirectLink}
+            >
               Copy direct link
             </DropdownMenuItem>
             <DropdownMenuItem onClick={onDeleteClick}>Delete</DropdownMenuItem>

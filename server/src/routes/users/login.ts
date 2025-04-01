@@ -1,6 +1,7 @@
+import { SettingKey } from '@perseusfs/shared';
 import jwt from 'jsonwebtoken';
+import { Settings } from '../../database/models/settings';
 import { User } from '../../database/models/user';
-import { JWT_SECRET } from '../../statics';
 import type { TCustomRequest, TErr, TErrors, TRes } from '../../types';
 
 const userLogin = async (req: TCustomRequest, res: TRes, err: TErr) => {
@@ -37,7 +38,7 @@ const userLogin = async (req: TCustomRequest, res: TRes, err: TErr) => {
       id: user?.id,
       email: user?.email
     },
-    JWT_SECRET,
+    Settings.get(SettingKey.JWT_SECRET),
     {
       expiresIn: '30d'
     }

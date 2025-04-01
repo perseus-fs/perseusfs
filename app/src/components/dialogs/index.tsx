@@ -3,12 +3,14 @@ import { useDialogInfo } from '@/hooks/use-dialog-info';
 import { memo } from 'react';
 import { ActionConfirmDialog } from './action-confirm';
 import { CreatePermissionDialog } from './create-permission';
+import { ShareFileDialog } from './share-file';
 import { UploadFileDialog } from './upload-file';
 
 enum Dialog {
   UPLOAD_FILES = 'UPLOAD_FILES',
   ACTION_CONFIRM = 'ACTION_CONFIRM',
-  CREATE_PERMISSION = 'CREATE_PERMISSION'
+  CREATE_PERMISSION = 'CREATE_PERMISSION',
+  SHARE_FILE = 'SHARE_FILE'
 }
 
 type TDialogProps = {
@@ -19,7 +21,8 @@ type TDialogProps = {
 const Dialogs = {
   [Dialog.UPLOAD_FILES]: UploadFileDialog,
   [Dialog.ACTION_CONFIRM]: ActionConfirmDialog,
-  [Dialog.CREATE_PERMISSION]: CreatePermissionDialog
+  [Dialog.CREATE_PERMISSION]: CreatePermissionDialog,
+  [Dialog.SHARE_FILE]: ShareFileDialog
 };
 
 const DialogProvider = memo(() => {

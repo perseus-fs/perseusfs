@@ -3,7 +3,6 @@ import path from "path";
 import { parseArgs } from "util";
 import { compile, execAsync, patchPackageJsonVersion } from "./helpers";
 import semver from "semver";
-import { InterfaceTag } from "@perseusfs/shared";
 
 const { values } = parseArgs({
   args: Bun.argv,

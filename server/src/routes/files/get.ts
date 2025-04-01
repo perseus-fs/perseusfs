@@ -4,12 +4,16 @@ import { Bucket } from '../../database/models/bucket';
 import { File } from '../../database/models/file';
 import { getResponseHeaders } from '../../helpers/get-response-headers';
 import { getUserFromToken } from '../../helpers/get-user-from-token';
+import { validateSignedUrl } from '../../helpers/signed';
 import type { TCustomRequest } from '../../types';
 
 const getFile = async (req: TCustomRequest) => {
   const url = new URL(req.url);
+  const { searchParams } = url;
   const urlParts = url.pathname.split('/').filter(Boolean);
   const token = req.headers.get('Authorization')?.replace('Bearer ', '');
+  const expires = Number(searchParams.get('expires') ?? 0);
+  const signature = searchParams.get('signature') ?? '';
 
   if (urlParts.length < 2) {
     return new Response('Not found', {
@@ -57,21 +61,37 @@ const getFile = async (req: TCustomRequest) => {
     const user = getUserFromToken(token);
 
     if (bucket.read === IOPermission.PRIVATE) {
-      if (!user) {
-        return new Response('Unauthorized', {
-          status: 401,
-          headers: getResponseHeaders()
-        });
-      }
+      if (expires && signature) {
+        const isValid = validateSignedUrl(
+          expires,
+          signature,
+          bucketKey,
+          fileKey
+        );
 
-      const { readPermission } =
-        user.getBucketPermissions(bucket.id) ?? DEFAULT_USER_PERMISSIONS;
+        if (!isValid) {
+          return new Response('Unauthorized', {
+            status: 401,
+            headers: getResponseHeaders()
+          });
+        }
+      } else {
+        if (!user) {
+          return new Response('Unauthorized', {
+            status: 401,
+            headers: getResponseHeaders()
+          });
+        }
 
-      if (!readPermission) {
-        return new Response('Forbidden', {
-          status: 403,
-          headers: getResponseHeaders()
-        });
+        const { readPermission } =
+          user.getBucketPermissions(bucket.id) ?? DEFAULT_USER_PERMISSIONS;
+
+        if (!readPermission) {
+          return new Response('Forbidden', {
+            status: 403,
+            headers: getResponseHeaders()
+          });
+        }
       }
     } else if (bucket.read === IOPermission.CUSTOM) {
       req.user = user;

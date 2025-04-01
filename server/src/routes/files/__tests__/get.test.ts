@@ -17,7 +17,6 @@ test('Get default file', async () => {
   const text = await response.text();
 
   expect(text).toBe(DEFAULT_FILE_CONTENT);
-  // expect(response.headers.get('Content-Type')).toBe('text/plain');
 });
 
 test('File does not exist in bucket', async () => {

@@ -1,6 +1,7 @@
+import { SettingKey } from '@perseusfs/shared';
 import jwt from 'jsonwebtoken';
+import { Settings } from '../database/models/settings';
 import { User } from '../database/models/user';
-import { JWT_SECRET } from '../statics';
 
 const getUserFromToken = (token: string | undefined): User | undefined => {
   try {
@@ -8,7 +9,7 @@ const getUserFromToken = (token: string | undefined): User | undefined => {
       return undefined;
     }
 
-    const jwtUser = jwt.verify(token, JWT_SECRET);
+    const jwtUser = jwt.verify(token, Settings.get(SettingKey.JWT_SECRET));
 
     if (!jwtUser || typeof jwtUser === 'string') {
       return undefined;

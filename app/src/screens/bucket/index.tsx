@@ -1,3 +1,4 @@
+import { invalidateBucket } from '@/actions/app';
 import { openDialog, requestConfirmation } from '@/actions/dialog';
 import { Dialog } from '@/components/dialogs';
 import { LoadingSection } from '@/components/loading-section';
@@ -11,6 +12,7 @@ import { filesize } from 'filesize';
 import { FileUp, FolderCog, RefreshCcw, Trash } from 'lucide-react';
 import { memo, useCallback, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router';
+import { toast } from 'sonner';
 import { FilesTable } from './table';
 
 type THeaderProps = {
@@ -58,9 +60,13 @@ const Header = memo(
         }
       });
 
-      if (response.ok) {
-        navigate('/');
+      if (!response.ok) {
+        toast.error('Error deleting bucket');
+        return;
       }
+
+      navigate('/');
+      invalidateBucket(bucket.id);
     }, [bucket.name, bucket.id, token, navigate]);
 
     return (

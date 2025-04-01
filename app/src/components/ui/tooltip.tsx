@@ -34,6 +34,10 @@ type TSimpleTooltipProps = {
 
 const SimpleTooltip = React.memo(
   ({ children, content }: TSimpleTooltipProps) => {
+    if (!content) {
+      return <>{children}</>;
+    }
+
     return (
       <TooltipProvider>
         <Tooltip>
