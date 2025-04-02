@@ -60,7 +60,7 @@ class RequestLog implements TRequestLog {
       createdAt: Date.now()
     });
 
-    return [true, {}];
+    return [true, undefined];
   }
 
   public static findAll() {

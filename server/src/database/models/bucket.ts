@@ -120,13 +120,13 @@ class Bucket implements TBucket {
     const errors = validateObject(bucket, ZedBucket);
 
     if (errors) {
-      return [-1, errors];
+      return [undefined, errors];
     }
 
     const existingBucket = Bucket.findByName(bucket.name!);
 
     if (existingBucket) {
-      return [-1, { name: 'Bucket with this name already exists' }];
+      return [undefined, { name: 'Bucket with this name already exists' }];
     }
 
     const query = db
@@ -155,7 +155,7 @@ class Bucket implements TBucket {
       fs.mkdirSync(bucketPath);
     }
 
-    return [Number(newBucketId), {}];
+    return [Number(newBucketId), undefined];
   }
 
   public static update(
@@ -230,7 +230,7 @@ class Bucket implements TBucket {
       updatedAt: Date.now()
     });
 
-    return [true, {}];
+    return [true, undefined];
   }
 
   public addPermission(

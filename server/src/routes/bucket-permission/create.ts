@@ -25,13 +25,16 @@ const createBucketPermission = async (
     return err({ userId: 'User not found' }, 404);
   }
 
-  const [success, errors] = bucket.addPermission(user.id, permission);
+  const [bucketPermissionId, errors] = bucket.addPermission(
+    user.id,
+    permission
+  );
 
-  if (!success) {
+  if (errors) {
     return err(errors);
   }
 
-  return res({ success: true });
+  return res({ success: true, bucketPermissionId });
 };
 
 export { createBucketPermission };

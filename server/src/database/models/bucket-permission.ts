@@ -51,11 +51,13 @@ class BucketPermission {
     db.exec('DROP TABLE IF EXISTS bucket_permissions');
   }
 
-  static create(bucketPermission: Partial<TBucketPermission>): TCreateResponse {
+  static create(
+    bucketPermission: Partial<TBucketPermission>
+  ): TCreateResponse<number | bigint> {
     const errors = validateObject(bucketPermission, ZedBucketPermission);
 
     if (errors) {
-      return [false, errors];
+      return [undefined, errors];
     }
 
     const query = db
@@ -64,7 +66,7 @@ class BucketPermission {
       )
       .as(BucketPermission);
 
-    query.run({
+    const { lastInsertRowid } = query.run({
       bucketId: bucketPermission.bucketId ?? 0,
       userId: bucketPermission.userId ?? 0,
       permission: bucketPermission.permission ?? EBucketPermission.READ,
@@ -72,7 +74,7 @@ class BucketPermission {
       updatedAt: Date.now()
     });
 
-    return [true, {}];
+    return [lastInsertRowid, undefined];
   }
 
   static findAllByBucketId(bucketId: number) {
@@ -220,7 +222,7 @@ class BucketPermission {
       updatedAt: Date.now()
     });
 
-    return [true, {}];
+    return [true, undefined];
   }
 
   public delete() {

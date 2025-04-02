@@ -20,7 +20,7 @@ const updateBucket = async (req: TCustomRequest, res: TRes, err: TErr) => {
     return err({ error: 'Forbidden' }, 403);
   }
 
-  const [success, errors] = Bucket.update(bucket.id, {
+  const [, errors] = Bucket.update(bucket.id, {
     name: body.name,
     read: body.read,
     write: body.write,
@@ -32,7 +32,7 @@ const updateBucket = async (req: TCustomRequest, res: TRes, err: TErr) => {
     retentionPolicy: body.retentionPolicy
   });
 
-  if (!success) {
+  if (errors) {
     return err(errors);
   }
 

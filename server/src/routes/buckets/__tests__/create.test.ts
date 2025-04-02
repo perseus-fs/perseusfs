@@ -31,10 +31,11 @@ test('Create bucket', async () => {
 
   expect(response.ok).toBe(true);
 
-  const { success } = await response.json();
+  const { success, bucketId } = await response.json();
 
   expect(response.status).toBe(200);
   expect(success).toBe(true);
+  expect(bucketId).toBeDefined();
 });
 
 test('No authentication tries to create bucket', async () => {

@@ -114,7 +114,7 @@ const populateDb = () => {
   Settings.set(SettingKey.CORS_ALLOW_ORIGIN, '*');
   Settings.set(SettingKey.EXTRA_HEADERS, {});
   Settings.set(SettingKey.EXTRA_CODE, '');
-  Settings.set(SettingKey.MAX_DISK_USAGE, 1024 * 1024 * 1024 * 10); // 10GB
+  Settings.set(SettingKey.MAX_DISK_USAGE, 0); // Unlimited
   Settings.set(SettingKey.JWT_SECRET, randomUUIDv7());
   Settings.set(SettingKey.SIGNED_URL_SECRET, randomUUIDv7());
 

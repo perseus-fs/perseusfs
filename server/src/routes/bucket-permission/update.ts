@@ -25,11 +25,11 @@ const updateBucketPermission = async (
     return err({ error: 'Forbidden' }, 403);
   }
 
-  const [success, errors] = BucketPermission.update(+bucketPermissionId, {
+  const [, errors] = BucketPermission.update(+bucketPermissionId, {
     permission: body.permission
   });
 
-  if (!success) {
+  if (errors) {
     return err(errors);
   }
 

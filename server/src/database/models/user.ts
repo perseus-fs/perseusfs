@@ -77,25 +77,25 @@ class User implements TUser {
     return count.count;
   }
 
-  static create(user: Partial<User>): TCreateResponse {
+  static create(user: Partial<User>): TCreateResponse<number | bigint> {
     const errors = validateObject(user, ZedUser);
 
     if (errors) {
-      return [false, errors];
+      return [undefined, errors];
     }
 
     if (user.email) {
       const existingUser = User.findByEmail(user.email);
 
       if (existingUser) {
-        return [false, { email: 'Email already in use' }];
+        return [undefined, { email: 'Email already in use' }];
       }
     }
 
     const existingUser = User.findByName(user.name ?? '');
 
     if (existingUser) {
-      return [false, { name: 'Name already in use' }];
+      return [undefined, { name: 'Name already in use' }];
     }
 
     const query = db
@@ -104,7 +104,7 @@ class User implements TUser {
       )
       .as(User);
 
-    query.run({
+    const { lastInsertRowid } = query.run({
       name: user.name ?? null,
       email: user.email ?? null,
       role: user.role ?? UserRole.USER,
@@ -113,7 +113,7 @@ class User implements TUser {
       updatedAt: Date.now()
     });
 
-    return [true, {}];
+    return [lastInsertRowid, undefined];
   }
 
   public isAdmin() {
@@ -208,7 +208,7 @@ class User implements TUser {
       updatedAt: Date.now()
     });
 
-    return [true, {}];
+    return [true, undefined];
   }
 
   public toJSON() {

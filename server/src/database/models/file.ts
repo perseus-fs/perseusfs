@@ -272,7 +272,7 @@ class File {
     const errors = validateObject(file, ZedFile);
 
     if (errors) {
-      return [-1, errors];
+      return [undefined, errors];
     }
 
     const query = db
@@ -294,7 +294,7 @@ class File {
       updatedAt: Date.now()
     });
 
-    return [lastInsertRowid, {}];
+    return [lastInsertRowid, undefined];
   }
 
   static deleteAllByBucketId(bucketId: number) {

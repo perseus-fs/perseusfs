@@ -18,14 +18,14 @@ const updateUser = async (req: TCustomRequest, res: TRes, err: TErr) => {
     return err({ error: 'Cannot update the default user' }, 403);
   }
 
-  const [success, errors] = user.update({
+  const [, errors] = user.update({
     name: body.name,
     role: body.role,
     password: body.password,
     email: body.email
   });
 
-  if (!success) {
+  if (errors) {
     return err(errors);
   }
 

@@ -1,10 +1,10 @@
 import type { User } from './database/models/user';
 
-export type TErrors = { [key: string]: string };
+export type TErrors = { [key: string]: string } | undefined;
 
 export type TGenericObject<T = any> = { [key: string]: T };
 
-export type TCreateResponse<T = boolean> = [T, TErrors];
+export type TCreateResponse<T = boolean> = [T | undefined, TErrors];
 
 export type TCustomRequest = Request & {
   user?: User;

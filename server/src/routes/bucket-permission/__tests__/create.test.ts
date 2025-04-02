@@ -18,14 +18,13 @@ test('Create new bucket permission', async () => {
     body: JSON.stringify(newBucketPermission)
   });
 
-  console.log('! response', response);
-
   expect(response.ok).toBe(true);
-
-  const { success } = await response.json();
-
   expect(response.status).toBe(200);
-  expect(success).toBe(true);
+
+  const { bucketPermissionId } = await response.json();
+
+  expect(bucketPermissionId).toBeDefined();
+  expect(bucketPermissionId).toBeGreaterThan(0);
 });
 
 test('No authentication tries to create bucket permission', async () => {

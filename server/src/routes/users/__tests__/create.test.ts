@@ -20,11 +20,12 @@ test('Create user', async () => {
   });
 
   expect(response.ok).toBe(true);
-
-  const { success } = await response.json();
-
   expect(response.status).toBe(200);
-  expect(success).toBe(true);
+
+  const { userId } = await response.json();
+
+  expect(userId).toBeDefined();
+  expect(userId).toBeGreaterThan(0);
 });
 
 test('No authentication tries to create user', async () => {
