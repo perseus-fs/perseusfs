@@ -196,7 +196,7 @@ export const columns: ColumnDef<TFile>[] = [
           getFileUrl(bucket.name, file.name, file.path)
         );
 
-        toast('Direct link copied to clipboard.');
+        toast.info('Direct link copied to clipboard.');
       };
 
       const onShareClick = () => {

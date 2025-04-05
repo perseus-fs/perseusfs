@@ -1,3 +1,4 @@
+import { useSelectFirstBucket } from '@/hooks/use-select-first-bucket';
 import { useUser } from '@/hooks/use-user';
 import { ChevronUp, User2 } from 'lucide-react';
 import { memo } from 'react';
@@ -17,6 +18,8 @@ import { UserActionsDropdown } from './user-actions-dropdown';
 
 const AppSidebar = memo(() => {
   const user = useUser();
+
+  useSelectFirstBucket();
 
   return (
     <Sidebar>

@@ -8,12 +8,14 @@ import {
 } from '@/components/ui/dialog';
 import { Group } from '@/components/ui/group';
 import { Input } from '@/components/ui/input';
+import { Tooltip } from '@/components/ui/tooltip';
 import { getApiUrl } from '@/helpers/get-api-url';
 import { getFileUrl } from '@/helpers/get-file-url';
 import { useToken } from '@/hooks/use-token';
 import { DATE_FORMAT } from '@/statics';
 import { IOPermission, TBucket, TFile } from '@perseusfs/shared';
 import { format } from 'date-fns';
+import { Copy } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { TDialogProps } from '..';
@@ -153,15 +155,19 @@ const ShareFileDialog = memo(
       (event) => {
         if (!url) return;
 
-        navigator.clipboard.writeText(url);
-        toast.info('URL copied to clipboard!');
-
         const input = event.target as HTMLInputElement;
         input.select();
         input.setSelectionRange(0, input.value.length);
       },
       [url]
     );
+
+    const onCopyClick = useCallback(() => {
+      if (!url) return;
+
+      navigator.clipboard.writeText(url);
+      toast.info('URL copied to clipboard!');
+    }, [url]);
 
     const canGenerateDirectLink = useMemo(
       () =>
@@ -177,8 +183,11 @@ const ShareFileDialog = memo(
             <DialogTitle>Share File</DialogTitle>
             <div className="flex flex-col gap-2 mt-2">
               <span className="text-sm text-muted-foreground">
-                The following URL lets you share this object without requiring a
-                login.
+                A signed URL is a URL that has been authorized to access a
+                specific resource. It contains a token that grants temporary
+                access to the resource, allowing users to download or view it
+                without needing to authenticate. If the bucket is public, you
+                can also generate a direct link.
               </span>
 
               <DaysPicker onChange={setExpiresIn} />
@@ -192,7 +201,7 @@ const ShareFileDialog = memo(
                 </span>
               </div>
 
-              <div>
+              <div className="flex gap-2 items-center">
                 <Input
                   readOnly
                   className="w-full"
@@ -200,6 +209,17 @@ const ShareFileDialog = memo(
                   value={url}
                   onClick={onInputClick}
                 />
+
+                <Tooltip content="Copy URL">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={onCopyClick}
+                    disabled={!url}
+                  >
+                    <Copy size="0.8rem" />
+                  </Button>
+                </Tooltip>
               </div>
 
               {!canGenerateDirectLink && (

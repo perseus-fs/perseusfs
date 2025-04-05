@@ -1,13 +1,12 @@
-import { TBucket } from '@perseusfs/shared';
 import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router';
+import { useBuckets } from './use-buckets';
 
-const useSelectFirstBucket = (buckets: TBucket[]) => {
+const useSelectFirstBucket = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const hasNavigated = useRef(false);
-
-  console.log('! location', location);
+  const { buckets } = useBuckets();
 
   useEffect(() => {
     if (
