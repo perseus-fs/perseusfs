@@ -15,6 +15,6 @@ export const invalidateBuckets = () => {
 export const invalidateBucket = (bucketId: number) => {
   invalidateBuckets();
   queryClient.invalidateQueries({
-    queryKey: ['buckets', bucketId]
+    queryKey: ['bucket', bucketId]
   });
 };
