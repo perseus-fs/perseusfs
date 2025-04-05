@@ -14,6 +14,7 @@ import { isTesting } from '../helpers/is-testing';
 import { Bucket } from './models/bucket';
 import { BucketPermission } from './models/bucket-permission';
 import { File } from './models/file';
+import { Migration } from './models/migration';
 import { RequestLog } from './models/request-log';
 import { Settings } from './models/settings';
 import { User } from './models/user';
@@ -142,6 +143,7 @@ const populateDb = () => {
 };
 
 const createTables = () => {
+  Migration.createTable();
   User.createTable();
   Bucket.createTable();
   BucketPermission.createTable();
@@ -151,6 +153,7 @@ const createTables = () => {
 };
 
 const dropAllTables = () => {
+  Migration.dropTable();
   User.dropTable();
   Bucket.dropTable();
   BucketPermission.dropTable();
@@ -159,7 +162,7 @@ const dropAllTables = () => {
   Settings.dropTable();
 };
 
-const loadDb = () => {
+const loadDb = async () => {
   const isInited = isDbInited();
 
   if (!isInited) {
@@ -191,6 +194,13 @@ const loadDb = () => {
       `${chalk.bgYellow('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')}\n`
     );
   }
+
+  if (Settings.showMigrations) {
+    Migration.printMigrations();
+    process.exit(0);
+  }
+
+  await Migration.runMigrations();
 };
 
 export { clearData, db, dropAllTables, loadDb };

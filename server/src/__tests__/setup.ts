@@ -118,7 +118,7 @@ beforeAll(async () => {
   await TestContext.init(server);
 });
 
-beforeEach(() => {
-  TestContext.resetDatabase(); // makes sure the database isn't altered from the previous test
+beforeEach(async () => {
+  await TestContext.resetDatabase(); // makes sure the database isn't altered from the previous test
   loadMocks();
 });

@@ -84,7 +84,6 @@ class RequestLog implements TRequestLog {
     return count.count;
   }
 
-  // object with count of logs per status code
   public static getStats(): { status: number; count: number }[] {
     const statsQuery = `
       SELECT status, COUNT(*) as count FROM request_logs

@@ -2,6 +2,7 @@ import { SettingKey } from '@perseusfs/shared';
 import chalk from 'chalk';
 import fs from 'fs';
 import { db } from '../database/db';
+import { Migration } from '../database/models/migration';
 import { Settings } from '../database/models/settings';
 import { getLocalIPAddress } from './get-local-ip';
 
@@ -23,7 +24,7 @@ const logDebug = () => {
   const dbStats = fs.statSync(db.filename).size / 1024 / 1024; // in MB
 
   console.log(
-    chalk.yellow('==================================================')
+    chalk.bgBlue('==================================================')
   );
   console.log(`${chalk.cyan('Debug Mode:')} ${chalk.white('Enabled')}`);
   console.log(`${chalk.cyan('Hostname:')} ${chalk.white(Settings.hostname)}`);
@@ -53,13 +54,16 @@ const logDebug = () => {
     `${chalk.cyan('Database:')} ${chalk.white(db.filename)} (${chalk.white(dbStats.toFixed(2))} MB)`
   );
   console.log(
+    `${chalk.cyan('Database version:')} ${chalk.white(Migration.getLastVersion())}`
+  );
+  console.log(
     `${chalk.cyan('Env vars:')} ${chalk.white(JSON.stringify(Settings.getFromEnv(), null, 2))}`
   );
   console.log(
     `${chalk.cyan('Args:')} ${chalk.white(JSON.stringify(Settings.getFromArgs(), null, 2))}`
   );
   console.log(
-    chalk.yellow('==================================================')
+    chalk.bgBlue('==================================================')
   );
 };
 

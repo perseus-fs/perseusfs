@@ -16,7 +16,7 @@ import { routes } from './routes/index';
 import type { TCustomRequest } from './types';
 
 logLogo();
-loadDb();
+await loadDb();
 patchInterface();
 
 const maxRequestBodySize = Settings.get(SettingKey.MAX_REQUEST_SIZE);

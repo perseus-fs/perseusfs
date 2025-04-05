@@ -149,10 +149,10 @@ class TestContext {
     return arrayBuffer;
   }
 
-  public resetDatabase() {
+  public async resetDatabase() {
     clearData(); // deletes the buckets directory
     dropAllTables();
-    loadDb();
+    await loadDb();
   }
 }
 

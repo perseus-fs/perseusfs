@@ -35,6 +35,7 @@ class Settings {
   public domain?: string;
   public port: number;
   public regenCredentials: boolean;
+  public showMigrations: boolean;
 
   private cache: Record<string, string> = {};
 
@@ -54,6 +55,10 @@ class Settings {
       regenCredentials:
         process.env.REGEN_CREDENTIALS !== undefined
           ? process.env.REGEN_CREDENTIALS === 'true'
+          : undefined,
+      showMigrations:
+        process.env.SHOW_MIGRATIONS !== undefined
+          ? process.env.SHOW_MIGRATIONS === 'true'
           : undefined
     };
   }
@@ -78,7 +83,8 @@ class Settings {
         port: { type: 'string', default: '3000' },
         regenCredentials: { type: 'boolean', default: false },
         help: { type: 'boolean', short: 'h', default: false },
-        version: { type: 'boolean', short: 'v', default: false }
+        version: { type: 'boolean', short: 'v', default: false },
+        showMigrations: { type: 'boolean', default: false }
       },
       strict: true,
       allowPositionals: true
@@ -101,6 +107,7 @@ class Settings {
     this.port = envValues.port ?? parseInt(argValues.port, 10);
     this.regenCredentials =
       envValues.regenCredentials ?? argValues.regenCredentials;
+    this.showMigrations = envValues.showMigrations ?? argValues.showMigrations;
 
     if (argValues.help) {
       this.printHelp();
@@ -127,6 +134,7 @@ class Settings {
     ${chalk.green('--hostname')}           The hostname to use for the server.
     ${chalk.green('--port')}               The port to use for the server.
     ${chalk.green('--regen-credentials')}  Regenerate the credentials for the server.
+    ${chalk.green('--show-migrations')}    Show information about the migrations.
     ${chalk.green('--help')}               Show this message.
     ${chalk.green('--version')}            Show the version of the server.
     `);
