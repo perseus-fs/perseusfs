@@ -51,6 +51,14 @@ test('User with write permission tries to upload file to private write file', as
 
   expect(response.ok).toBe(true);
   expect(response.status).toBe(200);
+
+  const { fileName, fileId, currentPath } = await response.json();
+
+  expect(fileName).toBeDefined();
+  expect(fileId).toBeDefined();
+  expect(currentPath).toBeDefined();
+  expect(fileName).toBe('test.txt');
+  expect(currentPath).toBe('bucket-2/test.txt');
 });
 
 test('Unauthenticated user tries to upload file to public write bucket', async () => {
@@ -100,12 +108,12 @@ test('Tries to upload the file twice (they do not collide)', async () => {
   expect(response1.status).toBe(200);
 
   const {
-    finalPath: finalPath1,
+    currentPath: currentPath1,
     fileName: fileName1,
     fileId: fileId1
   } = await response1.json();
 
-  expect(finalPath1).toBeDefined();
+  expect(currentPath1).toBeDefined();
   expect(fileName1).toBeDefined();
   expect(fileId1).toBeDefined();
 
@@ -124,16 +132,16 @@ test('Tries to upload the file twice (they do not collide)', async () => {
   expect(response2.status).toBe(200);
 
   const {
-    finalPath: finalPath2,
+    currentPath: currentPath2,
     fileName: fileName2,
     fileId: fileId2
   } = await response2.json();
 
-  expect(finalPath2).toBeDefined();
+  expect(currentPath2).toBeDefined();
   expect(fileName2).toBeDefined();
   expect(fileId2).toBeDefined();
 
-  expect(finalPath1).not.toBe(finalPath2);
+  expect(currentPath1).not.toBe(currentPath2);
   expect(fileName1).not.toBe(fileName2);
   expect(fileId1).not.toBe(fileId2);
 });

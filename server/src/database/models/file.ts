@@ -194,7 +194,7 @@ class File {
     uploadedBy: number | undefined,
     filePath: string
   ): {
-    finalPath: string;
+    currentPath: string;
     fileName: string;
     fileId: number | bigint;
   } {
@@ -264,7 +264,7 @@ class File {
     return {
       fileName: finalName,
       fileId,
-      finalPath: path.posix.join(bucket.name, relativePath, finalName)
+      currentPath: path.posix.join(bucket.name, relativePath, finalName)
     };
   }
 
