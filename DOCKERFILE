@@ -1,21 +1,11 @@
 FROM debian:latest
 
-# Install dependencies
-RUN apt-get update && apt-get install -y curl unzip && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y unzip && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables
-ENV ZIP_URL="..........."
+WORKDIR /app
 
-ENV WORKDIR="/app"
+COPY server/exports/linux-x64.zip ./perseusfs.zip
 
-# Create working directory
-WORKDIR $WORKDIR
+RUN unzip perseusfs.zip && rm perseusfs.zip && chmod +x perseusfs
 
-# Download, extract, and clean up
-RUN curl -L $ZIP_URL -o perseusfs.zip \
-    && unzip perseusfs.zip \
-    && rm perseusfs.zip \
-    && chmod +x perseusfs
-
-# List files at runtime for debugging
-CMD ["sh", "-c", "./perseusfs --debug"]
+CMD ["./perseusfs"]
