@@ -239,7 +239,7 @@ class BucketPermission {
       permission: this.permission,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
-      user: this._user
+      _user: this._user
     };
   }
 }
