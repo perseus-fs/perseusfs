@@ -112,7 +112,7 @@ const CreatePermissionDialog = memo(
       <Dialog {...dialogProps}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create permission</DialogTitle>
+            <DialogTitle>{isUpdate ? 'Edit' : 'Add'} permission</DialogTitle>
             <div className="flex flex-col gap-2 mt-2">
               <Group label="User" required error={errors.userId}>
                 <UserPicker
@@ -153,7 +153,7 @@ const CreatePermissionDialog = memo(
               }
               disabled={loading}
             >
-              Add permission
+              {isUpdate ? 'Update' : 'Add'} permission
             </Button>
           </DialogFooter>
         </DialogContent>

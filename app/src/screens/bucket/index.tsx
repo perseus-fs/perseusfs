@@ -7,13 +7,34 @@ import { Tooltip } from '@/components/ui/tooltip';
 import { getApiUrl } from '@/helpers/get-api-url';
 import { useBucket } from '@/hooks/use-bucket';
 import { useToken } from '@/hooks/use-token';
-import { TBucket, TFile, TUserBucketPermissions } from '@perseusfs/shared';
+import {
+  QuotaPolicy,
+  RetentionPolicy,
+  TBucket,
+  TFile,
+  TUserBucketPermissions
+} from '@perseusfs/shared';
 import { filesize } from 'filesize';
+import { upperFirst } from 'lodash';
 import { FileUp, FolderCog, RefreshCcw, Trash } from 'lucide-react';
 import { memo, useCallback, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 import { FilesTable } from './table';
+
+type TItemProps = {
+  label: string;
+  value: string;
+};
+
+const Item = memo(({ label, value }: TItemProps) => {
+  return (
+    <div className="flex gap-1">
+      <span>{label}:</span>
+      <span className="font-bold">{value}</span>
+    </div>
+  );
+});
 
 type THeaderProps = {
   bucket: TBucket;
@@ -101,19 +122,28 @@ const Header = memo(
           )}
         </div>
         <div className="flex gap-4 items-center">
-          <span>
-            Read: <span className="font-bold">{bucket.read.toUpperCase()}</span>
-          </span>
-          <span>
-            Write:{' '}
-            <span className="font-bold">{bucket.write.toUpperCase()}</span>
-          </span>
-          <span>
-            Files:{' '}
-            <span className="font-bold">
-              {files.length} ({filesize(filesSize)})
-            </span>
-          </span>
+          <Item label="Read" value={upperFirst(bucket.read)} />
+          <Item label="Write" value={upperFirst(bucket.write)} />
+          <Item
+            label="Files"
+            value={`${files.length} (${filesize(filesSize)})`}
+          />
+          <Item
+            label="Quota"
+            value={
+              bucket.quotaPolicy === QuotaPolicy.LIMITED
+                ? `${filesize(bucket.quota ?? 0)}`
+                : 'Unlimited'
+            }
+          />
+          <Item
+            label="Retention"
+            value={
+              bucket.retentionPolicy === RetentionPolicy.DISPOSE
+                ? `Keep files for ${bucket.retention} days`
+                : 'No retention policy'
+            }
+          />
         </div>
       </div>
     );
