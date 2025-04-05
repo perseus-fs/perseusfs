@@ -1,10 +1,9 @@
-import { pathToFileURL } from 'bun';
 import chalk from 'chalk';
-import fs from 'fs';
 import path from 'path';
+import { migrationsList } from '../../migrations/map';
 import { db } from '../db';
 
-const MIGRATIONS_PATH = path.join(process.cwd(), 'src/migrations');
+// const MIGRATIONS_PATH = path.join(process.cwd(), 'src/migrations');
 
 class Migration {
   public id!: number;
@@ -30,26 +29,20 @@ class Migration {
   }
 
   private static getAvailableMigrations() {
-    const migrationFiles = fs
-      .readdirSync(MIGRATIONS_PATH)
-      .filter((file) => file.endsWith('.ts'));
-
-    return migrationFiles
-      .map((file) => {
-        const parts = file.split('-');
-        const version = parseInt(parts[0], 10);
-        const name = parts.slice(1).join('-').replace('.ts', '');
-        const filePath = path.join(MIGRATIONS_PATH, file);
-
-        if (isNaN(version)) {
-          console.log(chalk.red(`Invalid migration file name: ${file}`));
-          process.exit(1);
-        }
+    return migrationsList
+      .map((migration) => {
+        const { version, name, ref } = migration;
+        const filePath = path.join(
+          process.cwd(),
+          'src/migrations',
+          `${name}.ts`
+        );
 
         return {
           version,
           name,
-          filePath
+          filePath,
+          up: ref.up
         };
       })
       .sort((a, b) => a.version - b.version);
@@ -145,9 +138,7 @@ class Migration {
     );
 
     for (const migration of newMigrations) {
-      const { version, name, filePath } = migration;
-      const { href } = pathToFileURL(filePath);
-      const { up } = await import(href);
+      const { version, name, up } = migration;
 
       if (!up) {
         console.log(
