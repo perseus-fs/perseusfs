@@ -23,7 +23,7 @@ import { format } from 'date-fns';
 import { filesize } from 'filesize';
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
 import { memo, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { toast } from 'sonner';
 import { Header } from './header';
 
@@ -251,7 +251,6 @@ const columns: ColumnDef<TFile>[] = [
 ];
 
 const Bucket = memo(() => {
-  const navigate = useNavigate();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: DEFAULT_PAGE_SIZE
@@ -299,11 +298,6 @@ const Bucket = memo(() => {
         columns={columns}
         refetch={refetch}
         loading={loading}
-        actions={
-          <Button size="sm" onClick={() => navigate('/users/create')}>
-            Create user
-          </Button>
-        }
         meta={meta}
         searchKey="name"
       />
