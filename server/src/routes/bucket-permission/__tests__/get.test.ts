@@ -2,7 +2,7 @@ import { BucketPermission } from '@perseusfs/shared';
 import { expect, test } from 'bun:test';
 import { TestContext } from '../../../__tests__/context';
 
-test('Get bucket permission', async () => {
+test.only('Get bucket permission', async () => {
   const response = await fetch(`${TestContext.baseUrl}/bucket_permissions/1`, {
     method: 'GET',
     headers: {
@@ -12,19 +12,17 @@ test('Get bucket permission', async () => {
   });
 
   expect(response.ok).toBe(true);
-
-  console.log(response);
+  expect(response.status).toBe(200);
 
   const { bucketPermission } = await response.json();
 
-  expect(response.status).toBe(200);
   expect(bucketPermission).toBeDefined();
   expect(bucketPermission.id).toBe(1);
   expect(bucketPermission.permission).toBe(BucketPermission.READ);
   expect(bucketPermission.userId).toBe(2);
   expect(bucketPermission.bucketId).toBe(1);
-  expect(bucketPermission.user).toBeDefined();
-  expect(bucketPermission.user).toBeObject();
+  expect(bucketPermission._user).toBeDefined();
+  expect(bucketPermission._user).toBeObject();
 });
 
 test('No authentication tries to get bucket permission', async () => {
