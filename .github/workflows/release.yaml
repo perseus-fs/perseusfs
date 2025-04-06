@@ -43,6 +43,13 @@ jobs:
         id: get_version
         run: echo "::set-output name=version::$(jq -r .version package.json)"
 
+      - name: Commit and push version bump
+        if: ${{ inputs.bump != 'none' }}
+        run: |
+          git add package.json
+          git commit -m "chore: bump version to ${{ steps.get_version.outputs.version }}"
+          git push
+
       - name: Identify user
         run: |
           git config user.name "github-actions[bot]"
