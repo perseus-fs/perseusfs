@@ -144,11 +144,11 @@ const ShareFileDialog = memo(
 
       const { signedUrl } = await response.json();
 
-      setUrl(`${getApiUrl()}${signedUrl}`);
+      setUrl(encodeURI(`${getApiUrl()}${signedUrl}`));
     }, [bucket.id, file.name, expiresIn, token]);
 
     const onGenerateDirectLinkClick = useCallback(() => {
-      setUrl(getFileUrl(bucket.name, file.name, file.path));
+      setUrl(encodeURI(getFileUrl(bucket.name, file.name, file.path)));
     }, [file.name, file.path, bucket.name]);
 
     const onInputClick = useCallback(

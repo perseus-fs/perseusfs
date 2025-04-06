@@ -84,7 +84,7 @@ const Pagination = memo(({ table, pageIndex, pageCount }: TPaginationProps) => {
   );
 });
 
-export const columns: ColumnDef<TRequestLog>[] = [
+const columns: ColumnDef<TRequestLog>[] = [
   {
     accessorKey: 'createdAt',
     size: 50,

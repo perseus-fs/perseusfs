@@ -14,6 +14,7 @@ import {
 } from '@tanstack/react-table';
 import { memo, useState } from 'react';
 import { LoadingSection } from '../loading-section';
+import { Input } from '../ui/input';
 import {
   Table,
   TableBody,
@@ -35,6 +36,7 @@ type TDataTableProps<T> = {
   loading?: boolean;
   actions?: React.ReactNode;
   meta?: TGenericObject;
+  searchKey?: string;
 };
 
 const DataTableRoot = <T,>({
@@ -45,7 +47,8 @@ const DataTableRoot = <T,>({
   refetch,
   loading,
   actions,
-  meta
+  meta,
+  searchKey
 }: TDataTableProps<T>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -73,6 +76,21 @@ const DataTableRoot = <T,>({
 
   return (
     <div className="flex flex-col gap-4">
+      {searchKey && (
+        <div>
+          <Input
+            placeholder="Search files..."
+            value={
+              (table.getColumn(searchKey)?.getFilterValue() as string) ?? ''
+            }
+            onChange={(event) =>
+              table.getColumn(searchKey)?.setFilterValue(event.target.value)
+            }
+            className="w-64"
+          />
+        </div>
+      )}
+
       <div className="flex justify-between items-center h-8">
         <Pagination
           table={table}

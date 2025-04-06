@@ -1,162 +1,279 @@
-import { invalidateBucket } from '@/actions/app';
 import { openDialog, requestConfirmation } from '@/actions/dialog';
+import { DataTable } from '@/components/data-table';
 import { Dialog } from '@/components/dialogs';
 import { LoadingSection } from '@/components/loading-section';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tooltip } from '@/components/ui/tooltip';
-import { getApiUrl } from '@/helpers/get-api-url';
-import { useBucket } from '@/hooks/use-bucket';
-import { useToken } from '@/hooks/use-token';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
-  QuotaPolicy,
-  RetentionPolicy,
-  TBucket,
-  TFile,
-  TUserBucketPermissions
-} from '@perseusfs/shared';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { getApiUrl } from '@/helpers/get-api-url';
+import { getFileUrl } from '@/helpers/get-file-url';
+import { useBucket } from '@/hooks/use-bucket';
+import { DATE_FORMAT, DEFAULT_PAGE_SIZE } from '@/statics';
+import { IOPermission, TBucket, TFile } from '@perseusfs/shared';
+import { ColumnDef, PaginationState } from '@tanstack/react-table';
+import { format } from 'date-fns';
 import { filesize } from 'filesize';
-import { upperFirst } from 'lodash';
-import { FileUp, FolderCog, RefreshCcw, Trash } from 'lucide-react';
-import { memo, useCallback, useMemo } from 'react';
+import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
+import { memo, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
-import { FilesTable } from './table';
+import { Header } from './header';
 
-type TItemProps = {
-  label: string;
-  value: string;
-};
-
-const Item = memo(({ label, value }: TItemProps) => {
-  return (
-    <div className="flex gap-1">
-      <span>{label}:</span>
-      <span className="font-bold">{value}</span>
-    </div>
-  );
-});
-
-type THeaderProps = {
-  bucket: TBucket;
-  files: TFile[];
-  refetch: () => void;
-  userPermissions: TUserBucketPermissions;
-};
-
-const Header = memo(
-  ({ bucket, userPermissions, files, refetch }: THeaderProps) => {
-    const token = useToken();
-    const navigate = useNavigate();
-
-    const onEditClick = useCallback(() => {
-      navigate(`/bucket/${bucket.id}/edit`);
-    }, [bucket.id, navigate]);
-
-    const filesSize = useMemo(
-      () => files.reduce((acc, file) => acc + file.size, 0),
-      [files]
-    );
-
-    const onUploadClick = useCallback(() => {
-      openDialog(Dialog.UPLOAD_FILES, {
-        onUploadSuccess: refetch,
-        bucketId: bucket.id
-      });
-    }, [bucket.id, refetch]);
-
-    const onDeleteClick = useCallback(async () => {
-      const result = await requestConfirmation({
-        title: `Deleting ${bucket.name}`,
-        message: `Are you sure you want to delete this bucket? All files within this bucket will be deleted. This action is irreversible.`,
-        confirmLabel: 'Delete'
-      });
-
-      if (!result) return;
-
-      const response = await fetch(`${getApiUrl()}/buckets/${bucket.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+const columns: ColumnDef<TFile>[] = [
+  {
+    id: 'select',
+    size: 5,
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
-      });
-
-      if (!response.ok) {
-        toast.error('Error deleting bucket');
-        return;
-      }
-
-      navigate('/');
-      invalidateBucket(bucket.id);
-    }, [bucket.name, bucket.id, token, navigate]);
-
-    return (
-      <div className="flex flex-col">
-        <div className="flex items-center gap-2">
-          <span className="text-3xl font-bold">{bucket?.name}</span>
-          <Tooltip content="Refresh">
-            <Button size="icon" variant="ghost" onClick={refetch}>
-              <RefreshCcw size="1rem" />
-            </Button>
-          </Tooltip>
-          {userPermissions.writePermission && (
-            <Tooltip content="Upload files">
-              <Button size="icon" variant="ghost" onClick={onUploadClick}>
-                <FileUp size="1rem" />
-              </Button>
-            </Tooltip>
-          )}
-          {userPermissions.managePermission && (
-            <>
-              <Tooltip content="Edit bucket">
-                <Button size="icon" variant="ghost" onClick={onEditClick}>
-                  <FolderCog size="1rem" />
-                </Button>
-              </Tooltip>
-              <Tooltip content="Delete bucket">
-                <Button size="icon" variant="ghost" onClick={onDeleteClick}>
-                  <Trash size="1rem" />
-                </Button>
-              </Tooltip>
-            </>
-          )}
-        </div>
-        <div className="flex gap-4 items-center">
-          <Item label="Read" value={upperFirst(bucket.read)} />
-          <Item label="Write" value={upperFirst(bucket.write)} />
-          <Item
-            label="Files"
-            value={`${files.length} (${filesize(filesSize)})`}
-          />
-          <Item
-            label="Quota"
-            value={
-              bucket.quotaPolicy === QuotaPolicy.LIMITED
-                ? `${filesize(bucket.quota ?? 0)}`
-                : 'Unlimited'
-            }
-          />
-          <Item
-            label="Retention"
-            value={
-              bucket.retentionPolicy === RetentionPolicy.DISPOSE
-                ? `Keep files for ${bucket.retention} days`
-                : 'No retention policy'
-            }
-          />
-        </div>
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false
+  },
+  {
+    accessorKey: 'name',
+    size: 100,
+    header: ({ column }) => (
+      <div className="flex items-center">
+        File name
+        <Button
+          size="icon"
+          variant="ghost"
+          className="ml-2"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          <ArrowUpDown />
+        </Button>
       </div>
-    );
+    ),
+    cell: ({ row }) => {
+      const { path } = row.original;
+
+      const pathComp = path ? (
+        <Badge variant="outline" className="mr-2">
+          {path}
+        </Badge>
+      ) : null;
+
+      return (
+        <div className="lowercase text-left">
+          {pathComp}
+          {row.getValue('name')}
+        </div>
+      );
+    }
+  },
+  {
+    accessorKey: 'hash',
+    size: 100,
+    header: () => <div className="flex items-center">Hash</div>,
+    cell: ({ row }) => (
+      <div className="lowercase text-left">{row.getValue('hash')}</div>
+    )
+  },
+  {
+    accessorKey: 'createdAt',
+    size: 40,
+    header: ({ column }) => (
+      <div className="flex items-center">
+        Uploaded at
+        <Button
+          size="icon"
+          variant="ghost"
+          className="ml-2"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          <ArrowUpDown />
+        </Button>
+      </div>
+    ),
+    cell: ({ row }) => {
+      const createdAt = row.getValue('createdAt');
+
+      return (
+        <div className="text-left">
+          {createdAt ? format(+createdAt, DATE_FORMAT) : '-'}
+        </div>
+      );
+    }
+  },
+  {
+    accessorKey: 'size',
+    size: 20,
+    header: ({ column }) => (
+      <div className="flex items-center">
+        Size
+        <Button
+          size="icon"
+          variant="ghost"
+          className="ml-2"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          <ArrowUpDown />
+        </Button>
+      </div>
+    ),
+    cell: ({ row }) => {
+      const size = parseInt(row.getValue('size') as string);
+
+      return <div className="text-left">{filesize(size)}</div>;
+    }
+  },
+  {
+    accessorKey: 'contentType',
+    size: 40,
+    header: ({ column }) => (
+      <div className="flex items-center">
+        MIME type
+        <Button
+          size="icon"
+          variant="ghost"
+          className="ml-2"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          <ArrowUpDown />
+        </Button>
+      </div>
+    ),
+    cell: ({ row }) => {
+      const contentType = row.getValue('contentType') as string;
+
+      return <div className="text-left">{contentType}</div>;
+    }
+  },
+  {
+    id: 'actions',
+    size: 5,
+    enableHiding: false,
+    cell: ({ row, table }) => {
+      const file = row.original;
+      const { bucket, token, refetch } = table.options.meta as {
+        bucket: TBucket;
+        token: string;
+        refetch: () => void;
+      };
+
+      const onDeleteClick = async () => {
+        const result = await requestConfirmation({
+          title: `Deleting ${file.name}`,
+          message: `Are you sure you want to delete this file? This action is irreversible.`,
+          confirmLabel: 'Delete'
+        });
+
+        if (!result) return;
+
+        const response = await fetch(`${getApiUrl()}/files/${file.id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          toast.success('File deleted successfully.');
+          refetch();
+        } else {
+          toast.error('An error occurred while deleting the file.');
+        }
+      };
+
+      const onDownloadClick = () => {
+        window.open(getFileUrl(bucket.name, file.name, file.path));
+      };
+
+      const onCopyDirectLinkClick = () => {
+        navigator.clipboard.writeText(
+          getFileUrl(bucket.name, file.name, file.path)
+        );
+
+        toast.info('Direct link copied to clipboard.');
+      };
+
+      const onShareClick = () => {
+        openDialog(Dialog.SHARE_FILE, {
+          file,
+          bucket
+        });
+      };
+
+      const canGenerateDirectLink =
+        bucket.read === IOPermission.PUBLIC ||
+        bucket.read === IOPermission.CUSTOM;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onDownloadClick}>
+              Download
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onShareClick}>Share</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={onCopyDirectLinkClick}
+              disabled={!canGenerateDirectLink}
+            >
+              Copy direct link
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onDeleteClick}>Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    }
   }
-);
+];
 
 const Bucket = memo(() => {
+  const navigate = useNavigate();
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: DEFAULT_PAGE_SIZE
+  });
+
   const { id } = useParams<{
     id: string;
   }>();
 
   const { files, bucket, loading, userPermissions, refetch } = useBucket(
     +(id || 0)
+  );
+
+  console.log('! files', files);
+
+  const meta = useMemo(
+    () => ({
+      token: localStorage.getItem('token'),
+      bucket,
+      refetch
+    }),
+    [bucket, refetch]
   );
 
   if (loading) {
@@ -175,7 +292,21 @@ const Bucket = memo(() => {
         refetch={refetch}
         userPermissions={userPermissions}
       />
-      <FilesTable bucket={bucket} files={files} refetch={refetch} />
+      <DataTable<TFile>
+        data={files}
+        setPagination={setPagination}
+        pagination={pagination}
+        columns={columns}
+        refetch={refetch}
+        loading={loading}
+        actions={
+          <Button size="sm" onClick={() => navigate('/users/create')}>
+            Create user
+          </Button>
+        }
+        meta={meta}
+        searchKey="name"
+      />
     </div>
   );
 });
