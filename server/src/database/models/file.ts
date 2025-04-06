@@ -16,7 +16,7 @@ import { Bucket } from './bucket';
 import { Settings } from './settings';
 
 class File {
-  public id!: number;
+  public id!: number | bigint;
   public bucketId!: number;
   public name!: string;
   public path!: string;
@@ -72,12 +72,13 @@ class File {
   static getUniqueName(
     relativePath: string,
     baseName: string,
-    extension: string
+    extension: string,
+    bucketId: number
   ) {
     let counter = 0;
     let candidate = `${baseName}${extension}`;
 
-    const allFiles = File.findAll();
+    const allFiles = File.findAllByBucketId(bucketId);
 
     while (
       allFiles.some(
@@ -107,7 +108,8 @@ class File {
           createdAt INTEGER NOT NULL,
           updatedAt INTEGER NOT NULL,
           FOREIGN KEY (bucketId) REFERENCES buckets(id) ON DELETE CASCADE,
-          FOREIGN KEY (uploadedBy) REFERENCES users(id) ON DELETE CASCADE
+          FOREIGN KEY (uploadedBy) REFERENCES users(id) ON DELETE CASCADE,
+          UNIQUE (bucketId, name)
       );
     `);
   }
@@ -232,7 +234,8 @@ class File {
     const finalName = File.getUniqueName(
       relativePath,
       sanitizedName,
-      extension
+      extension,
+      bucketId
     );
 
     const bucketPath = path.join(Bucket.getPath(bucket.name), relativePath);
@@ -303,7 +306,7 @@ class File {
     return query.run({ bucketId });
   }
 
-  static findById(id: number) {
+  static findById(id: number | bigint) {
     const query = db.query('SELECT * FROM files WHERE id = $id').as(File);
 
     return File.parse(query.get({ id }));
