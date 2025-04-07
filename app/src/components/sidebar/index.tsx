@@ -3,6 +3,7 @@ import { useUser } from '@/hooks/use-user';
 import { ChevronUp, User2 } from 'lucide-react';
 import { memo } from 'react';
 import { AdminOnly } from '../admin-only';
+import { Info } from '../info';
 import { DropdownMenu, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import {
   Sidebar,
@@ -32,6 +33,8 @@ const AppSidebar = memo(() => {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
+            <Info />
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
