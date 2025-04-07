@@ -1,6 +1,6 @@
 {
   "name": "perseusfs",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "build": "bun --bun ./scripts/build.ts"
   },
