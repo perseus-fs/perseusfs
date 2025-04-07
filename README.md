@@ -1,17 +1,73 @@
-# PerseusFS
+<div style="text-align: center">
+  <h1>PerseusFS</h1>
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+  <a href="https://choosealicense.com/licenses/mit/">
+    <img
+      src="https://img.shields.io/badge/License-MIT-green.svg"
+      alt="MIT License"
+    />
+  </a>
 
-A lightweight, simplified, self-hosted file store. Create and configure buckets, manage users, and control access—all from a single-file executable. Ships with a minimalistic web interface and a public API, making it easy to integrate or use out of the box. Perfect for small projects. Powered by [Bun](https://github.com/oven-sh/bun).
+  <p>
+    A lightweight, simplified, self-hosted file store. Create and configure
+    buckets, manage users, and control access—all from a single-file executable.
+    Ships with a minimalistic web interface and a public API, making it easy to
+    integrate or use out of the box. Perfect for small projects. Powered by
+    <a href="https://github.com/oven-sh/bun">Bun</a>.
+  </p>
 
-### [Download here](https://github.com/diogomartino/perseusfs/releases/latest)
+  <div
+    style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    "
+  >
+    <img
+      src="https://img.shields.io/badge/Bun-1.2.8-orange"
+      alt="Bun version"
+    />
+    <img
+      src="https://img.shields.io/badge/License-MIT-green"
+      alt="MIT License"
+    />
+    <img
+      src="https://img.shields.io/badge/OS-Linux%20%7C%20MacOS%20%7C%20Windows-lightgrey"
+      alt="Supported OS"
+    />
+    <img
+      src="https://img.shields.io/badge/Arch-x64%20%7C%20ARM64-lightgrey"
+      alt="Supported Architecture"
+    />
+    <img
+      src="https://img.shields.io/badge/Status-Alpha-red"
+      alt="Project Status"
+    />
+  </div>
 
-## Demo
-
-[Coming soon...](#)
+  <div
+    style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    "
+  >
+    <h2>
+      <a href="https://github.com/diogomartino/perseusfs/releases/latest"
+        >Download</a
+      >
+    </h2>
+    <h2>
+      <a href="https://github.com/diogomartino/perseusfs/releases/latest"
+        >Demo</a
+      >
+    </h2>
+  </div>
+</div>
 
 ## Download
-
 
 ### Linux x64
 
