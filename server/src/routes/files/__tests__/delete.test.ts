@@ -1,7 +1,7 @@
 import { beforeEach, expect, test } from 'bun:test';
 import { TestContext } from '../../../__tests__/context';
 
-let fileId: number;
+let fileId: number | bigint;
 
 beforeEach(() => {
   fileId = TestContext.ensureFile('new-file.txt', 1).id;

@@ -1,7 +1,9 @@
+import { StaticKey } from '@perseusfs/shared';
 import chalk from 'chalk';
 import path from 'path';
 import { migrationsList } from '../../migrations/map';
 import { db } from '../db';
+import { Statics } from './statics';
 
 // const MIGRATIONS_PATH = path.join(process.cwd(), 'src/migrations');
 
@@ -26,6 +28,16 @@ class Migration {
 
   public static dropTable() {
     db.exec('DROP TABLE IF EXISTS migrations');
+  }
+
+  public static getMostRecentMigrationVersion() {
+    const { version } = migrationsList[migrationsList.length - 1];
+
+    return version;
+  }
+
+  public static getStartingMigrationVersion() {
+    return Statics.get(StaticKey.FIRST_START_DB_VERSION);
   }
 
   private static getAvailableMigrations() {
@@ -77,13 +89,14 @@ class Migration {
     });
   }
 
-  static getLastVersion() {
+  static getLastMigratedVersion() {
     const query = db.query(
-      'SELECT MAX(version) as version FROM migrations WHERE error IS NULL LIMIT 1'
+      'SELECT MAX(version) as version FROM migrations WHERE error IS NULL'
     );
     const result = query.get() as { version: number | null };
+    const version = result.version ?? -1;
 
-    return result.version || 0;
+    return version;
   }
 
   public static printMigrations() {
@@ -124,9 +137,12 @@ class Migration {
 
   public static async runMigrations() {
     const availableMigrations = this.getAvailableMigrations();
-    const lastVersion = this.getLastVersion();
+    const lastMigratedVersion = this.getLastMigratedVersion();
+    const startingMigrationVersion = this.getStartingMigrationVersion();
     const newMigrations = availableMigrations.filter(
-      (migration) => migration.version > lastVersion
+      (migration) =>
+        migration.version > lastMigratedVersion &&
+        migration.version > startingMigrationVersion
     );
 
     if (newMigrations.length === 0) {

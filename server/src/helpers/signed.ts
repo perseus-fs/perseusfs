@@ -1,6 +1,6 @@
-import { SettingKey } from '@perseusfs/shared';
+import { StaticKey } from '@perseusfs/shared';
 import crypto from 'crypto';
-import { Settings } from '../database/models/settings';
+import { Statics } from '../database/models/statics';
 
 const generateSignedUrl = (
   bucketName: string,
@@ -10,7 +10,7 @@ const generateSignedUrl = (
   const expiresAt = Math.floor(Date.now() / 1000) + expiresInSeconds;
   const path = `/${bucketName}/${fileName}?expires=${expiresAt}`;
 
-  const secret = Settings.get(SettingKey.SIGNED_URL_SECRET) || '';
+  const secret = Statics.get(StaticKey.SIGNED_URL_SECRET) || '';
   const signature = crypto
     .createHmac('sha256', secret)
     .update(path)
@@ -30,7 +30,7 @@ const validateSignedUrl = (
   }
 
   const path = `/${bucketName}/${fileName}?expires=${expiresAt}`;
-  const secret = Settings.get(SettingKey.SIGNED_URL_SECRET) || '';
+  const secret = Statics.get(StaticKey.SIGNED_URL_SECRET) || '';
   const expectedSignature = crypto
     .createHmac('sha256', secret)
     .update(path)

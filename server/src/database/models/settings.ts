@@ -13,8 +13,6 @@ type SettingTypes = {
   [SettingKey.EXTRA_HEADERS]: Record<string, string>;
   [SettingKey.EXTRA_CODE]: string;
   [SettingKey.MAX_DISK_USAGE]: number;
-  [SettingKey.JWT_SECRET]: string;
-  [SettingKey.SIGNED_URL_SECRET]: string;
 };
 
 const types: { [K in keyof SettingTypes]: string } = {
@@ -22,9 +20,7 @@ const types: { [K in keyof SettingTypes]: string } = {
   [SettingKey.CORS_ALLOW_ORIGIN]: 'string',
   [SettingKey.EXTRA_HEADERS]: 'object',
   [SettingKey.EXTRA_CODE]: 'string',
-  [SettingKey.MAX_DISK_USAGE]: 'number',
-  [SettingKey.JWT_SECRET]: 'string',
-  [SettingKey.SIGNED_URL_SECRET]: 'string'
+  [SettingKey.MAX_DISK_USAGE]: 'number'
 };
 
 class Settings {

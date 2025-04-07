@@ -1,9 +1,10 @@
-import { SettingKey } from '@perseusfs/shared';
+import { SettingKey, StaticKey } from '@perseusfs/shared';
 import chalk from 'chalk';
 import fs from 'fs';
 import { db } from '../database/db';
 import { Migration } from '../database/models/migration';
 import { Settings } from '../database/models/settings';
+import { Statics } from '../database/models/statics';
 import { getLocalIPAddress } from './get-local-ip';
 
 const logLogo = () => {
@@ -54,7 +55,16 @@ const logDebug = () => {
     `${chalk.cyan('Database:')} ${chalk.white(db.filename)} (${chalk.white(dbStats.toFixed(2))} MB)`
   );
   console.log(
-    `${chalk.cyan('Database version:')} ${chalk.white(Migration.getLastVersion())}`
+    `${chalk.cyan('Database version:')} ${chalk.white(Migration.getLastMigratedVersion())}`
+  );
+  console.log(
+    `${chalk.cyan('First start on:')} v${chalk.white(new Date(Statics.get(StaticKey.FIRST_START_DATE)).toLocaleString())}`
+  );
+  console.log(
+    `${chalk.cyan('First start version:')} v${chalk.white(Statics.get(StaticKey.FIRST_START_VERSION))}`
+  );
+  console.log(
+    `${chalk.cyan('First start database version:')} ${chalk.white(Statics.get(StaticKey.FIRST_START_DB_VERSION))}`
   );
   console.log(
     `${chalk.cyan('Env vars:')} ${chalk.white(JSON.stringify(Settings.getFromEnv(), null, 2))}`

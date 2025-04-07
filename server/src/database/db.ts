@@ -3,6 +3,7 @@ import {
   QuotaPolicy,
   RetentionPolicy,
   SettingKey,
+  StaticKey,
   UserRole
 } from '@perseusfs/shared';
 import { randomUUIDv7 } from 'bun';
@@ -17,6 +18,7 @@ import { File } from './models/file';
 import { Migration } from './models/migration';
 import { RequestLog } from './models/request-log';
 import { Settings } from './models/settings';
+import { Statics } from './models/statics';
 import { User } from './models/user';
 
 const TESTING_IN_MEMORY = true;
@@ -116,8 +118,15 @@ const populateDb = () => {
   Settings.set(SettingKey.EXTRA_HEADERS, {});
   Settings.set(SettingKey.EXTRA_CODE, '');
   Settings.set(SettingKey.MAX_DISK_USAGE, 0); // Unlimited
-  Settings.set(SettingKey.JWT_SECRET, randomUUIDv7());
-  Settings.set(SettingKey.SIGNED_URL_SECRET, randomUUIDv7());
+
+  Statics.set(StaticKey.JWT_SECRET, randomUUIDv7());
+  Statics.set(StaticKey.SIGNED_URL_SECRET, randomUUIDv7());
+  Statics.set(StaticKey.FIRST_START_VERSION, Settings.buildInfo.version);
+  Statics.set(
+    StaticKey.FIRST_START_DB_VERSION,
+    Migration.getMostRecentMigrationVersion()
+  );
+  Statics.set(StaticKey.FIRST_START_DATE, Date.now());
 
   console.log(
     `\n${chalk.bgYellow('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')}`
@@ -150,6 +159,7 @@ const createTables = () => {
   File.createTable();
   RequestLog.createTable();
   Settings.createTable();
+  Statics.createTable();
 };
 
 const dropAllTables = () => {
@@ -160,6 +170,7 @@ const dropAllTables = () => {
   File.dropTable();
   RequestLog.dropTable();
   Settings.dropTable();
+  Statics.dropTable();
 };
 
 const loadDb = async () => {

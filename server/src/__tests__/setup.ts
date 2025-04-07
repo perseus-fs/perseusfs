@@ -3,7 +3,7 @@ import {
   IOPermission,
   QuotaPolicy,
   RetentionPolicy,
-  SettingKey,
+  StaticKey,
   UserRole
 } from '@perseusfs/shared';
 import { afterAll, beforeAll, beforeEach } from 'bun:test';
@@ -11,7 +11,7 @@ import { server } from '../app';
 import { Bucket } from '../database/models/bucket';
 import { BucketPermission } from '../database/models/bucket-permission';
 import { File } from '../database/models/file';
-import { Settings } from '../database/models/settings';
+import { Statics } from '../database/models/statics';
 import { User } from '../database/models/user';
 import { TestContext } from './context';
 
@@ -129,8 +129,8 @@ const loadMocks = () => {
   );
 
   // make sure the secrets are always the same so we don't need to login all the time to get a valid token
-  Settings.set(SettingKey.JWT_SECRET, 'talk quietly');
-  Settings.set(SettingKey.SIGNED_URL_SECRET, 'its a secret');
+  Statics.set(StaticKey.JWT_SECRET, 'talk quietly');
+  Statics.set(StaticKey.SIGNED_URL_SECRET, 'its a secret');
 };
 
 afterAll(() => server.stop());

@@ -1,12 +1,20 @@
-import * as migration1 from './1-welcome_to_perseusfs';
+import * as migration1 from './1-mock';
 
-export const migrationsList = [
+const list = [
   {
     version: 1,
-    name: 'welcome_to_perseusfs',
+    name: 'mock',
     ref: migration1
   }
 ];
+
+// sort to be extra sure the last migration in the list is the most recent one
+export const migrationsList = list.sort((a, b) => {
+  if (a.version < b.version) return -1;
+  if (a.version > b.version) return 1;
+
+  return 0;
+});
 
 // this file is a workaround for bun not being able to correctly bundle files as of now
 // when bundling is fixed, this file will be removed and the migrations will be read directly from memory
