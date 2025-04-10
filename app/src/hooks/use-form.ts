@@ -6,7 +6,7 @@ const useForm = (initialValues?: TGenericObject) => {
   const [errors, setErrors] = useState<TGenericObject>({});
 
   const onFieldChange = useCallback(
-    (name: string, value: string) => {
+    (name: string, value: string | number | boolean) => {
       setValues((prev) => ({ ...prev, [name]: value }));
     },
     [setValues]

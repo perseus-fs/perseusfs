@@ -12,7 +12,6 @@ type TUpdateSettingsBody = Partial<TSettings>;
 
 const updateSettings = async (req: TCustomRequest, res: TRes, err: TErr) => {
   const body = (await req.json()) as TUpdateSettingsBody;
-
   const errors = validateObject(body, ZedSettings);
 
   if (errors) {
@@ -21,6 +20,11 @@ const updateSettings = async (req: TCustomRequest, res: TRes, err: TErr) => {
 
   Object.values(SettingKey).forEach((key) => {
     const value = (body as any)[key];
+
+    if (key === 'demoMode' && req.user?.id !== 1) {
+      // only super user can change demo mode
+      return;
+    }
 
     if (value !== undefined) {
       Settings.set(key, value);

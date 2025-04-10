@@ -16,6 +16,7 @@ import {
 import { getApiUrl } from '@/helpers/get-api-url';
 import { getFileUrl } from '@/helpers/get-file-url';
 import { useBucket } from '@/hooks/use-bucket';
+import { useIsDemoModeLocked } from '@/hooks/use-is-demo-mode-locked';
 import { DATE_FORMAT, DEFAULT_PAGE_SIZE } from '@/statics';
 import { IOPermission, TBucket, TFile } from '@perseusfs/shared';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
@@ -168,10 +169,11 @@ const columns: ColumnDef<TFile>[] = [
     enableHiding: false,
     cell: ({ row, table }) => {
       const file = row.original;
-      const { bucket, token, refetch } = table.options.meta as {
+      const { bucket, token, refetch, isDemoLocked } = table.options.meta as {
         bucket: TBucket;
         token: string;
         refetch: () => void;
+        isDemoLocked: boolean;
       };
 
       const onDeleteClick = async () => {
@@ -212,6 +214,8 @@ const columns: ColumnDef<TFile>[] = [
       };
 
       const onShareClick = () => {
+        if (isDemoLocked) return;
+
         openDialog(Dialog.SHARE_FILE, {
           file,
           bucket
@@ -235,7 +239,9 @@ const columns: ColumnDef<TFile>[] = [
             <DropdownMenuItem onClick={onDownloadClick}>
               Download
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={onShareClick}>Share</DropdownMenuItem>
+            <DropdownMenuItem onClick={onShareClick} disabled={isDemoLocked}>
+              Share
+            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={onCopyDirectLinkClick}
               disabled={!canGenerateDirectLink}
@@ -251,6 +257,7 @@ const columns: ColumnDef<TFile>[] = [
 ];
 
 const Bucket = memo(() => {
+  const isDemoLocked = useIsDemoModeLocked();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: DEFAULT_PAGE_SIZE
@@ -264,15 +271,14 @@ const Bucket = memo(() => {
     +(id || 0)
   );
 
-  console.log('! files', files);
-
   const meta = useMemo(
     () => ({
       token: localStorage.getItem('token'),
       bucket,
-      refetch
+      refetch,
+      isDemoLocked
     }),
-    [bucket, refetch]
+    [bucket, refetch, isDemoLocked]
   );
 
   if (loading) {

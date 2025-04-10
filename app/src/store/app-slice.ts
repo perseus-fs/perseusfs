@@ -1,19 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 export interface IAppState {
-  currentTime: number;
+  demoMode: boolean;
 }
 
 const initialState: IAppState = {
-  currentTime: 0
+  demoMode: false
 };
 
 export const appSlice = createSlice({
   name: 'app',
   initialState,
   reducers: {
-    setCurrentTime: (state, action) => {
-      state.currentTime = action.payload;
+    setDemoMode: (state, action) => {
+      state.demoMode = action.payload;
     }
   }
 });

@@ -1,4 +1,4 @@
-console.clear();
+// console.clear();
 loadContext();
 
 import { SettingKey } from '@perseusfs/shared';

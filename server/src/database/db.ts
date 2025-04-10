@@ -118,6 +118,7 @@ const populateDb = () => {
   Settings.set(SettingKey.EXTRA_HEADERS, {});
   Settings.set(SettingKey.EXTRA_CODE, '');
   Settings.set(SettingKey.MAX_DISK_USAGE, 0); // Unlimited
+  Settings.set(SettingKey.DEMO_MODE, false);
 
   Statics.set(StaticKey.JWT_SECRET, randomUUIDv7());
   Statics.set(StaticKey.SIGNED_URL_SECRET, randomUUIDv7());

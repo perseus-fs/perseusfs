@@ -3,18 +3,28 @@ import { LoadingSection } from '@/components/loading-section';
 import { Button } from '@/components/ui/button';
 import { Group } from '@/components/ui/group';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { getApiUrl } from '@/helpers/get-api-url';
 import { useForm } from '@/hooks/use-form';
+import { useIsDemoModeLocked } from '@/hooks/use-is-demo-mode-locked';
+import { useIsSuperUser } from '@/hooks/use-is-super-user';
 import { useSettings } from '@/hooks/use-settings';
 import { useToken } from '@/hooks/use-token';
 import { javascript } from '@codemirror/lang-javascript';
 import { filesize } from 'filesize';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { DiskUsageHelp, ExtraHeadersHelp, InterfaceScriptsHelp } from './help';
+import {
+  DemoModeHelp,
+  DiskUsageHelp,
+  ExtraHeadersHelp,
+  InterfaceScriptsHelp
+} from './help';
 
 const Settings = memo(() => {
   const token = useToken();
+  const isSuperUser = useIsSuperUser();
+  const isDemoLocked = useIsDemoModeLocked();
   const { settings, loading: loadingData } = useSettings();
   const [loading, setLoading] = useState(false);
 
@@ -57,7 +67,8 @@ const Settings = memo(() => {
         corsAllowOrigin: values.corsAllowOrigin,
         extraHeaders: JSON.parse(values.extraHeaders),
         extraCode: values.extraCode,
-        maxDiskUsage: values.maxDiskUsage
+        maxDiskUsage: values.maxDiskUsage,
+        demoMode: isSuperUser ? values.demoMode : undefined
       })
     });
 
@@ -71,7 +82,7 @@ const Settings = memo(() => {
     }
 
     toast.success('Settings updated successfully');
-  }, [token, values, setErrors]);
+  }, [token, values, setErrors, isSuperUser]);
 
   if (loadingData) {
     return <LoadingSection />;
@@ -90,6 +101,7 @@ const Settings = memo(() => {
           {...r('maxRequestSize', true)}
           type="number"
           className="w-[300px]"
+          disabled={isDemoLocked}
         />
         <span className="text-xs text-muted-foreground">
           {filesize(values.maxRequestSize ?? 0)}
@@ -108,6 +120,7 @@ const Settings = memo(() => {
           {...r('maxDiskUsage', true)}
           type="number"
           className="w-[300px]"
+          disabled={isDemoLocked}
         />
         <span className="text-xs text-muted-foreground">
           {filesize(values.maxDiskUsage ?? 0)}
@@ -120,7 +133,12 @@ const Settings = memo(() => {
         description="The origin that is allowed to access PerseusFS. Use '*' to allow all origins. Make sure you know what you are doing before changing this. Invalid values WILL prevent you from reaching your server."
         required
       >
-        <Input {...r('corsAllowOrigin')} type="text" className="w-[300px]" />
+        <Input
+          {...r('corsAllowOrigin')}
+          type="text"
+          className="w-[300px]"
+          disabled={isDemoLocked}
+        />
       </Group>
 
       <Group
@@ -135,6 +153,7 @@ const Settings = memo(() => {
           extensions={[javascript()]}
           onChange={(value) => onFieldChange('extraHeaders', value)}
           value={values.extraHeaders}
+          readOnly={isDemoLocked}
         />
       </Group>
 
@@ -149,12 +168,32 @@ const Settings = memo(() => {
           width="1000px"
           extensions={[javascript()]}
           onChange={(value) => onFieldChange('extraCode', value)}
-          value={values.extraCode}
+          value={isDemoLocked ? '' : values.extraCode}
+          readOnly={isDemoLocked}
         />
       </Group>
 
+      <Group
+        label="Demo Mode"
+        error={errors.demoMode}
+        description="This setting can only be changed by the super user."
+        help={<DemoModeHelp />}
+      >
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="demo-mode"
+            disabled={!isSuperUser || isDemoLocked}
+            checked={values.demoMode}
+            onCheckedChange={(value) => onFieldChange('demoMode', value)}
+          />
+          <span className="text-sm text-muted-foreground">
+            {values.demoMode ? 'Enabled' : 'Disabled'}
+          </span>
+        </div>
+      </Group>
+
       <div>
-        <Button onClick={onSubmitHandler} disabled={loading}>
+        <Button onClick={onSubmitHandler} disabled={loading || isDemoLocked}>
           Save
         </Button>
       </div>

@@ -1,5 +1,7 @@
+import { SettingKey } from '@perseusfs/shared';
 import { expect, test } from 'bun:test';
 import { TestContext } from '../../../__tests__/context';
+import { Settings } from '../../../database/models/settings';
 
 test('Tries to generate signed url', async () => {
   const response = await fetch(`${TestContext.baseUrl}/files/sign-url`, {
@@ -92,4 +94,24 @@ test('User tries to generate signed url for non-existing bucket', async () => {
 
   expect(response.ok).toBe(false);
   expect(response.status).toBe(404);
+});
+
+test.only('Non super user tries to generate signed url when demo mode is enabled', async () => {
+  Settings.set(SettingKey.DEMO_MODE, true);
+
+  const response = await fetch(`${TestContext.baseUrl}/files/sign-url`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${TestContext.loginTokens[6]}`
+    },
+    body: JSON.stringify({
+      bucketId: 1,
+      fileName: 'welcome.txt',
+      expiresInSeconds: 3600
+    })
+  });
+
+  expect(response.ok).toBe(false);
+  expect(response.status).toBe(403);
 });

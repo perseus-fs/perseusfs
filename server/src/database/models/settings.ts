@@ -13,6 +13,7 @@ type SettingTypes = {
   [SettingKey.EXTRA_HEADERS]: Record<string, string>;
   [SettingKey.EXTRA_CODE]: string;
   [SettingKey.MAX_DISK_USAGE]: number;
+  [SettingKey.DEMO_MODE]: boolean;
 };
 
 const types: { [K in keyof SettingTypes]: string } = {
@@ -20,7 +21,8 @@ const types: { [K in keyof SettingTypes]: string } = {
   [SettingKey.CORS_ALLOW_ORIGIN]: 'string',
   [SettingKey.EXTRA_HEADERS]: 'object',
   [SettingKey.EXTRA_CODE]: 'string',
-  [SettingKey.MAX_DISK_USAGE]: 'number'
+  [SettingKey.MAX_DISK_USAGE]: 'number',
+  [SettingKey.DEMO_MODE]: 'boolean'
 };
 
 class Settings {
@@ -171,6 +173,10 @@ class Settings {
       return JSON.parse(value) as SettingTypes[K];
     }
 
+    if (type === 'boolean') {
+      return (value === 'true') as SettingTypes[K];
+    }
+
     return value as SettingTypes[K];
   }
 
@@ -183,6 +189,8 @@ class Settings {
 
     if (types[key] === 'object') {
       finalValue = JSON.stringify(value);
+    } else if (types[key] === 'boolean') {
+      finalValue = value ? 'true' : 'false';
     } else {
       finalValue = value.toString();
     }

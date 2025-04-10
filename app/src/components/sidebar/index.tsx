@@ -34,7 +34,6 @@ const AppSidebar = memo(() => {
         <SidebarMenu>
           <SidebarMenuItem>
             <Info />
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>

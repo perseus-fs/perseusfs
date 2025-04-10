@@ -1,4 +1,5 @@
 import { adminOnly, authenticate } from '../../middlewares/authenticate';
+import { demoLock } from '../../middlewares/demo-lock';
 import { listSettings } from './list';
 import { updateSettings } from './update';
 
@@ -11,6 +12,6 @@ export default [
   {
     method: 'PUT',
     path: '/settings',
-    handlers: [authenticate, adminOnly, updateSettings]
+    handlers: [authenticate, adminOnly, demoLock, updateSettings]
   }
 ];

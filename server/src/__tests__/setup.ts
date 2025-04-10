@@ -42,6 +42,12 @@ const loadMocks = () => {
       password: 'password',
       email: 'user5@user.com'
     }),
+    User.create({
+      name: 'user-6',
+      role: UserRole.ADMIN,
+      password: 'password',
+      email: 'user-6@user.com'
+    }),
     // --------------- BUCKETS
     Bucket.create({
       name: 'bucket-2',

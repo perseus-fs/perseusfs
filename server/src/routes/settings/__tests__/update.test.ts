@@ -1,6 +1,7 @@
-import { type TSettings } from '@perseusfs/shared';
+import { SettingKey, type TSettings } from '@perseusfs/shared';
 import { expect, test } from 'bun:test';
 import { TestContext } from '../../../__tests__/context';
+import { Settings } from '../../../database/models/settings';
 
 test('Update settings', async () => {
   const newData: Partial<TSettings> = {
@@ -56,6 +57,42 @@ test('User needs higher role to update settings', async () => {
   expect(response.status).toBe(403);
 });
 
+test('Super user tries to enable demo mode', async () => {
+  const response = await fetch(`${TestContext.baseUrl}/settings`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${TestContext.loginTokens[1]}`
+    },
+    body: JSON.stringify({
+      demoMode: true
+    })
+  });
+
+  expect(response.ok).toBe(true);
+  expect(response.status).toBe(200);
+});
+
+test('Non super user tries to enable demo mode', async () => {
+  const response = await fetch(`${TestContext.baseUrl}/settings`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${TestContext.loginTokens[6]}`
+    },
+    body: JSON.stringify({
+      demoMode: true
+    })
+  });
+
+  expect(response.ok).toBe(true);
+  expect(response.status).toBe(200);
+
+  const demoMode = Settings.get(SettingKey.DEMO_MODE);
+
+  expect(demoMode).toBe(false); // didn't change
+});
+
 test('Settings data is being validated', async () => {
   const wrongSettings = {
     corsAllowOrigin: null,
@@ -86,4 +123,25 @@ test('Settings data is being validated', async () => {
   expect(errors.maxRequestSize).toBeDefined();
   expect(errors.maxDiskUsage).toBeDefined();
   expect(Object.keys(errors).length).toBe(5);
+});
+
+test('Non super user tries to update settings when demo mode is enabled', async () => {
+  Settings.set(SettingKey.DEMO_MODE, true);
+
+  const newData: Partial<TSettings> = {
+    corsAllowOrigin: 'new-origin',
+    maxRequestSize: 4444
+  };
+
+  const response = await fetch(`${TestContext.baseUrl}/settings`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${TestContext.loginTokens[6]}`
+    },
+    body: JSON.stringify(newData)
+  });
+
+  expect(response.ok).toBe(false);
+  expect(response.status).toBe(403);
 });

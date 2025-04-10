@@ -6,6 +6,7 @@ export enum SettingKey {
   EXTRA_HEADERS = "extraHeaders",
   EXTRA_CODE = "extraCode",
   MAX_DISK_USAGE = "maxDiskUsage",
+  DEMO_MODE = "demoMode",
 }
 
 const ZedSettings = z.object({
@@ -14,6 +15,7 @@ const ZedSettings = z.object({
   [SettingKey.EXTRA_HEADERS]: z.record(z.string()),
   [SettingKey.EXTRA_CODE]: z.string(),
   [SettingKey.MAX_DISK_USAGE]: z.number().int().nonnegative(),
+  [SettingKey.DEMO_MODE]: z.boolean(),
 });
 
 type TZedSettings = z.infer<typeof ZedSettings>;

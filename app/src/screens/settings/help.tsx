@@ -47,4 +47,16 @@ gtag('config', 'G-XXXXXXX');
   );
 });
 
-export { DiskUsageHelp, ExtraHeadersHelp, InterfaceScriptsHelp };
+const DemoModeHelp = memo(() => {
+  return (
+    <span>
+      This will enable demo mode, which will allow to showcase the app in a
+      production-like environment. Some settings that normally are editable by
+      any administrator will only be editable by the super administrator. This
+      is to prevent users from changing critical configurations that could
+      affect the overall system stability and security.
+    </span>
+  );
+});
+
+export { DemoModeHelp, DiskUsageHelp, ExtraHeadersHelp, InterfaceScriptsHelp };

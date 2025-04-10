@@ -1,3 +1,4 @@
+import { setDemoMode } from '@/actions/app';
 import { doLogout, setUser } from '@/actions/user';
 import { getApiUrl } from '@/helpers/get-api-url';
 import { useCallback, useEffect, useState } from 'react';
@@ -27,12 +28,13 @@ const useAuthenticateUser = () => {
       return;
     }
 
-    const { user } = await response.json();
+    const { user, demoMode } = await response.json();
 
     if (!user) return;
 
     setUser(user);
     setAuthenticated(true);
+    setDemoMode(demoMode ?? false);
   }, [token]);
 
   useEffect(() => {

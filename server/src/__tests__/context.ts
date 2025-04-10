@@ -120,7 +120,8 @@ class TestContext {
       2: await this.login('user-2', 'password'),
       3: await this.login('user-3', 'password'),
       4: await this.login('user-4', 'password'),
-      5: await this.login('user-5', 'password')
+      5: await this.login('user-5', 'password'),
+      6: await this.login('user-6', 'password')
     };
   }
 

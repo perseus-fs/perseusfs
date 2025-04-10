@@ -1,5 +1,6 @@
 import { useBucket } from '@/hooks/use-bucket';
 import { useForm } from '@/hooks/use-form';
+import { useIsDemoModeLocked } from '@/hooks/use-is-demo-mode-locked';
 import { CODE_READ_BOILERPLATE, CODE_WRITE_BOILERPLATE } from '@/statics';
 import { javascript } from '@codemirror/lang-javascript';
 import {
@@ -43,6 +44,7 @@ const DEFAULT_VALUES: Partial<TZedBucket> = {
 const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
   const { bucket } = useBucket(bucketId);
   const isUpdate = useMemo(() => !!bucketId, [bucketId]);
+  const isDemoLocked = useIsDemoModeLocked();
 
   const { r, rs, setErrors, errors, values, onFieldChange } = useForm(
     bucket ?? DEFAULT_VALUES
@@ -75,7 +77,11 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
             className="w-full"
             help={<IOHelp verb="read" />}
           >
-            <Select {...rs('read')} defaultValue={IOPermission.PUBLIC}>
+            <Select
+              {...rs('read')}
+              defaultValue={IOPermission.PUBLIC}
+              disabled={isDemoLocked}
+            >
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder="Select read permission" />
               </SelectTrigger>
@@ -99,6 +105,7 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
                 extensions={[javascript()]}
                 onChange={(value) => onFieldChange('customRead', value)}
                 value={CODE_READ_BOILERPLATE}
+                readOnly={isDemoLocked}
               />
             </Group>
           )}
@@ -110,7 +117,11 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
             className="w-full"
             help={<IOHelp verb="write" />}
           >
-            <Select {...rs('write')} defaultValue={IOPermission.PRIVATE}>
+            <Select
+              {...rs('write')}
+              defaultValue={IOPermission.PRIVATE}
+              disabled={isDemoLocked}
+            >
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder="Select write permission" />
               </SelectTrigger>
@@ -140,6 +151,7 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
                 extensions={[javascript()]}
                 value={CODE_WRITE_BOILERPLATE}
                 onChange={(value) => onFieldChange('customWrite', value)}
+                readOnly={isDemoLocked}
               />
             </Group>
           )}
@@ -153,6 +165,7 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
             <Select
               {...rs('retentionPolicy')}
               defaultValue={RetentionPolicy.NEVER_DELETE}
+              disabled={isDemoLocked}
             >
               <SelectTrigger className="w-[260px]">
                 <SelectValue placeholder="Select retention policy" />
@@ -179,6 +192,7 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
                 {...r('retention', true)}
                 type="number"
                 className="w-[100px]"
+                disabled={isDemoLocked}
               />
             </Group>
           )}
@@ -190,7 +204,11 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
             className="w-full"
             help={<QuotaHelp />}
           >
-            <Select {...rs('quotaPolicy')} defaultValue={QuotaPolicy.UNLIMITED}>
+            <Select
+              {...rs('quotaPolicy')}
+              defaultValue={QuotaPolicy.UNLIMITED}
+              disabled={isDemoLocked}
+            >
               <SelectTrigger className="w-[260px]">
                 <SelectValue placeholder="Quota" />
               </SelectTrigger>
@@ -213,6 +231,7 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
                 {...r('quota', true)}
                 type="number"
                 className="w-[300px]"
+                disabled={isDemoLocked}
               />
               <span className="text-xs text-muted-foreground">
                 {filesize(values.quota ?? 0)}

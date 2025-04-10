@@ -1,4 +1,5 @@
 import { authenticate } from '../../middlewares/authenticate';
+import { demoLock } from '../../middlewares/demo-lock';
 import { deleteFile } from './delete';
 import { getFile } from './get';
 import { signUrl } from './sign-url';
@@ -8,7 +9,7 @@ export default [
   {
     method: 'POST',
     path: '/files/sign-url',
-    handlers: [authenticate, signUrl]
+    handlers: [authenticate, demoLock, signUrl]
   },
   { method: 'POST', path: '/upload', handlers: [uploadFile] },
   {

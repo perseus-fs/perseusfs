@@ -206,8 +206,6 @@ const UploadFileDialog = memo(
       [prepareFiles]
     );
 
-    console.log('files', files);
-
     return (
       <Dialog {...dialogProps}>
         <DialogContent>

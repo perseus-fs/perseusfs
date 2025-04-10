@@ -26,8 +26,6 @@ beforeEach(() => {
 });
 
 test('Delete bucket', async () => {
-  console.log('Bucket ID:', bucketId);
-
   const response = await fetch(`${TestContext.baseUrl}/buckets/${bucketId}`, {
     method: 'DELETE',
     headers: {
