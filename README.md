@@ -1,13 +1,6 @@
 <div style="text-align: center">
   <h1>PerseusFS</h1>
 
-  <a href="https://choosealicense.com/licenses/mit/">
-    <img
-      src="https://img.shields.io/badge/License-MIT-green.svg"
-      alt="MIT License"
-    />
-  </a>
-
   <p>
     A lightweight, simplified, self-hosted file store. Create and configure
     buckets, manage users, and control access—all from a single-file executable.
@@ -16,14 +9,7 @@
     <a href="https://github.com/oven-sh/bun">Bun</a>.
   </p>
 
-  <div
-    style="
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 20px;
-    "
-  >
+  <div>
     <img
       src="https://img.shields.io/badge/Bun-1.2.8-orange"
       alt="Bun version"
@@ -54,20 +40,20 @@
       gap: 20px;
     "
   >
-    <h2>
+    <h3>
       <a href="https://github.com/diogomartino/perseusfs/releases/latest"
         >Download</a
       >
-    </h2>
-    <h2>
+    </h3>
+    <h3>
       <a href="https://github.com/diogomartino/perseusfs/releases/latest"
         >Demo</a
       >
-    </h2>
+    </h3>
   </div>
 </div>
 
-## Download
+## Installation
 
 ### Linux x64
 
