@@ -14,6 +14,7 @@ type SettingTypes = {
   [SettingKey.EXTRA_CODE]: string;
   [SettingKey.MAX_DISK_USAGE]: number;
   [SettingKey.DEMO_MODE]: boolean;
+  [SettingKey.REQUEST_LOGS_RETENTION]: number;
 };
 
 const types: { [K in keyof SettingTypes]: string } = {
@@ -22,7 +23,8 @@ const types: { [K in keyof SettingTypes]: string } = {
   [SettingKey.EXTRA_HEADERS]: 'object',
   [SettingKey.EXTRA_CODE]: 'string',
   [SettingKey.MAX_DISK_USAGE]: 'number',
-  [SettingKey.DEMO_MODE]: 'boolean'
+  [SettingKey.DEMO_MODE]: 'boolean',
+  [SettingKey.REQUEST_LOGS_RETENTION]: 'number'
 };
 
 class Settings {

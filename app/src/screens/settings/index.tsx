@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Group } from '@/components/ui/group';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import { formatSeconds } from '@/helpers/format-seconds';
 import { getApiUrl } from '@/helpers/get-api-url';
 import { useForm } from '@/hooks/use-form';
 import { useIsDemoModeLocked } from '@/hooks/use-is-demo-mode-locked';
@@ -68,7 +69,8 @@ const Settings = memo(() => {
         extraHeaders: JSON.parse(values.extraHeaders),
         extraCode: values.extraCode,
         maxDiskUsage: values.maxDiskUsage,
-        demoMode: isSuperUser ? values.demoMode : undefined
+        demoMode: isSuperUser ? values.demoMode : undefined,
+        requestLogsRetention: values.requestLogsRetention
       })
     });
 
@@ -124,6 +126,27 @@ const Settings = memo(() => {
         />
         <span className="text-xs text-muted-foreground">
           {filesize(values.maxDiskUsage ?? 0)}
+        </span>
+      </Group>
+
+      <Group
+        className="flex items-center gap-2"
+        label="Logs Retention"
+        error={errors.requestLogsRetention}
+        description="The amount of time that logs will be kept in the database. In seconds. Set to 0 to keep logs forever."
+        required
+      >
+        <Input
+          {...r('requestLogsRetention', true)}
+          type="number"
+          className="w-[300px]"
+          disabled={isDemoLocked}
+        />
+        {/* <span className="text-xs text-muted-foreground">
+          {filesize(values.requestLogsRetention ?? 0)}
+        </span> */}
+        <span className="text-xs text-muted-foreground">
+          {formatSeconds(values.requestLogsRetention ?? 0)}
         </span>
       </Group>
 

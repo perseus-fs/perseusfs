@@ -1,10 +1,12 @@
 import {
+  SettingKey,
   validateObject,
   ZedRequestLog,
   type TRequestLog
 } from '@perseusfs/shared';
 import { type TCreateResponse } from '../../types';
 import { db } from '../db';
+import { Settings } from './settings';
 
 class RequestLog implements TRequestLog {
   public id!: number;
@@ -72,6 +74,27 @@ class RequestLog implements TRequestLog {
     const logs = db.query(logsQuery).as(RequestLog).all();
 
     return logs;
+  }
+
+  public static deleteOldLogs() {
+    const retentionInSeconds = Settings.get(SettingKey.REQUEST_LOGS_RETENTION);
+
+    if (!retentionInSeconds) {
+      return 0;
+    }
+
+    const retentionInMilliseconds = retentionInSeconds * 1000;
+    const retentionDate = Date.now() - retentionInMilliseconds;
+    const deleteQuery = `
+      DELETE FROM request_logs
+      WHERE createdAt < $retentionDate
+    `;
+
+    const { changes } = db.query(deleteQuery).run({
+      retentionDate
+    });
+
+    return changes;
   }
 
   public static getCount() {

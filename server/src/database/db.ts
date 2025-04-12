@@ -119,6 +119,7 @@ const populateDb = () => {
   Settings.set(SettingKey.EXTRA_CODE, '');
   Settings.set(SettingKey.MAX_DISK_USAGE, 0); // Unlimited
   Settings.set(SettingKey.DEMO_MODE, false);
+  Settings.set(SettingKey.REQUEST_LOGS_RETENTION, 14 * 24 * 60 * 60); // 14 days
 
   Statics.set(StaticKey.JWT_SECRET, randomUUIDv7());
   Statics.set(StaticKey.SIGNED_URL_SECRET, randomUUIDv7());
