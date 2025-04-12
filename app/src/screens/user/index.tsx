@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { getApiUrl } from '@/helpers/get-api-url';
+import { useIsDemoModeLocked } from '@/hooks/use-is-demo-mode-locked';
 import { useRemoteUsers } from '@/hooks/use-remote-users';
 import { useToken } from '@/hooks/use-token';
 import { DATE_FORMAT, DEFAULT_PAGE_SIZE } from '@/statics';
@@ -78,10 +79,11 @@ const columns: ColumnDef<TUser>[] = [
     cell: ({ row, table }) => {
       const user = row.original;
 
-      const { token, refetch, navigate } = table.options.meta as {
+      const { token, refetch, navigate, isDemoLocked } = table.options.meta as {
         token: string;
         refetch: () => void;
         navigate: (path: string) => void;
+        isDemoLocked: boolean;
       };
 
       const onDeleteClick = async () => {
@@ -123,10 +125,16 @@ const columns: ColumnDef<TUser>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onEditClick} disabled={user.id === 1}>
+            <DropdownMenuItem
+              onClick={onEditClick}
+              disabled={user.id === 1 || isDemoLocked}
+            >
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={onDeleteClick} disabled={user.id === 1}>
+            <DropdownMenuItem
+              onClick={onDeleteClick}
+              disabled={user.id === 1 || isDemoLocked}
+            >
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -138,6 +146,7 @@ const columns: ColumnDef<TUser>[] = [
 
 const Users = memo(() => {
   const navigate = useNavigate();
+  const isDemoLocked = useIsDemoModeLocked();
   const token = useToken();
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -148,8 +157,8 @@ const Users = memo(() => {
   const { users, loading, refetch } = useRemoteUsers();
 
   const meta = useMemo(
-    () => ({ token, navigate, refetch }),
-    [token, navigate, refetch]
+    () => ({ token, navigate, refetch, isDemoLocked }),
+    [token, navigate, refetch, isDemoLocked]
   );
 
   if (loading) {
@@ -166,7 +175,11 @@ const Users = memo(() => {
         refetch={refetch}
         loading={loading}
         actions={
-          <Button size="sm" onClick={() => navigate('/users/create')}>
+          <Button
+            size="sm"
+            onClick={() => navigate('/users/create')}
+            disabled={isDemoLocked}
+          >
             Create user
           </Button>
         }

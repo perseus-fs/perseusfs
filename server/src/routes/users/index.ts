@@ -1,4 +1,5 @@
 import { adminOnly, authenticate } from '../../middlewares/authenticate';
+import { demoLock } from '../../middlewares/demo-lock';
 import { userAuth } from './auth';
 import { createUser } from './create';
 import { deleteUser } from './delete';
@@ -18,17 +19,17 @@ export default [
   {
     method: 'POST',
     path: '/users',
-    handlers: [authenticate, adminOnly, createUser]
+    handlers: [authenticate, adminOnly, demoLock, createUser]
   },
   {
     method: 'DELETE',
     path: '/users/:userId',
-    handlers: [authenticate, adminOnly, deleteUser]
+    handlers: [authenticate, adminOnly, demoLock, deleteUser]
   },
   {
     method: 'PUT',
     path: '/users/:userId',
-    handlers: [authenticate, adminOnly, updateUser]
+    handlers: [authenticate, adminOnly, demoLock, updateUser]
   },
   {
     method: 'GET',
