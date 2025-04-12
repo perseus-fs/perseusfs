@@ -46,7 +46,7 @@
       >
     </h3>
     <h3>
-      <a href="https://github.com/diogomartino/perseusfs/releases/latest"
+      <a href="https://demo.perseusfs.dev/_"
         >Demo</a
       >
     </h3>
