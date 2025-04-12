@@ -3,6 +3,7 @@ import { openDialog, requestConfirmation } from '@/actions/dialog';
 import { Dialog } from '@/components/dialogs';
 import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
+import { formatSeconds } from '@/helpers/format-seconds';
 import { getApiUrl } from '@/helpers/get-api-url';
 import { useToken } from '@/hooks/use-token';
 import {
@@ -137,8 +138,8 @@ const Header = memo(
             label="Retention"
             value={
               bucket.retentionPolicy === RetentionPolicy.DISPOSE
-                ? `Keep files for ${bucket.retention} days`
-                : 'No retention policy'
+                ? `Keep files for ${formatSeconds(bucket.retention ?? 0)}`
+                : 'Keep files forever'
             }
           />
         </div>

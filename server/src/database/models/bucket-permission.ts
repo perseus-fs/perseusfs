@@ -14,8 +14,8 @@ class BucketPermission {
   public userId!: number;
   public _user!: TUser | null;
   public permission!: EBucketPermission;
-  public createdAt!: string;
-  public updatedAt!: string;
+  public createdAt!: number;
+  public updatedAt!: number;
 
   private static parse(
     bucketPermission: BucketPermission | null

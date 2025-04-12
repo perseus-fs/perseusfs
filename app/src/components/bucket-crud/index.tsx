@@ -1,3 +1,4 @@
+import { formatSeconds } from '@/helpers/format-seconds';
 import { useBucket } from '@/hooks/use-bucket';
 import { useForm } from '@/hooks/use-form';
 import { useIsDemoModeLocked } from '@/hooks/use-is-demo-mode-locked';
@@ -69,7 +70,6 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
           <Group label="Name" error={errors.name} required>
             <Input {...r('name')} type="text" className="w-[300px]" />
           </Group>
-
           <Group
             label="Read"
             error={errors.read}
@@ -92,7 +92,6 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
               </SelectContent>
             </Select>
           </Group>
-
           {values.read === IOPermission.CUSTOM && (
             <Group
               label="Custom read permission"
@@ -109,7 +108,6 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
               />
             </Group>
           )}
-
           <Group
             label="Write"
             error={errors.write}
@@ -132,7 +130,6 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
               </SelectContent>
             </Select>
           </Group>
-
           {values.write === IOPermission.CUSTOM && (
             <Group
               label="Custom write permission"
@@ -155,7 +152,6 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
               />
             </Group>
           )}
-
           <Group
             label="Retention"
             error={errors.read}
@@ -185,18 +181,24 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
             <Group
               label="Retention period"
               error={errors.retention}
-              description="In days"
+              className="flex items-center gap-2"
+              description="The time after which files will be deleted. In seconds."
               required
             >
               <Input
                 {...r('retention', true)}
                 type="number"
-                className="w-[100px]"
+                step={1}
+                min={0}
+                className="w-[200px]"
                 disabled={isDemoLocked}
+                defaultValue={3600}
               />
+              <span className="text-xs text-muted-foreground">
+                {formatSeconds(values.retention ?? 0)}
+              </span>
             </Group>
           )}
-
           <Group
             label="Quota"
             error={errors.read}
@@ -218,7 +220,6 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
               </SelectContent>
             </Select>
           </Group>
-
           {values.quotaPolicy === QuotaPolicy.LIMITED && (
             <Group
               className="flex items-center gap-2"
@@ -238,7 +239,6 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
               </span>
             </Group>
           )}
-
           <div>
             <Button onClick={onSubmitHandler} disabled={loading}>
               {isUpdate ? 'Save' : 'Create'}

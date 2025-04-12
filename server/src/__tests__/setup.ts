@@ -6,7 +6,7 @@ import {
   StaticKey,
   UserRole
 } from '@perseusfs/shared';
-import { afterAll, beforeAll, beforeEach } from 'bun:test';
+import { afterAll, beforeAll, beforeEach, setDefaultTimeout } from 'bun:test';
 import { server } from '../app';
 import { Bucket } from '../database/models/bucket';
 import { BucketPermission } from '../database/models/bucket-permission';
@@ -93,6 +93,17 @@ const loadMocks = () => {
       retention: null,
       retentionPolicy: RetentionPolicy.NEVER_DELETE
     }),
+    Bucket.create({
+      name: 'bucket-6',
+      customRead: null,
+      customWrite: null,
+      quota: null,
+      quotaPolicy: QuotaPolicy.UNLIMITED,
+      read: IOPermission.PUBLIC,
+      write: IOPermission.PUBLIC,
+      retention: 5, // 5 seconds
+      retentionPolicy: RetentionPolicy.DISPOSE
+    }),
     // --------------- PERMISSIONS
     BucketPermission.create({
       userId: 2,
@@ -147,6 +158,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  setDefaultTimeout(10000);
   await TestContext.resetDatabase(); // makes sure the database isn't altered from the previous test
   loadMocks();
 });

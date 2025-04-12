@@ -42,6 +42,16 @@ const getFile = async (req: TCustomRequest) => {
     });
   }
 
+  if (dbFile.isDisposable()) {
+    // file is supposed to already be deleted but cron didn't run yet, so we delete it here
+    dbFile.delete();
+
+    return new Response('Not found', {
+      status: 404,
+      headers: getResponseHeaders()
+    });
+  }
+
   const filePath = path.resolve(
     Bucket.getPath(bucketKey),
     dbFile.path ?? '',

@@ -1,5 +1,6 @@
 import {
   QuotaPolicy,
+  RetentionPolicy,
   SettingKey,
   validateObject,
   ZedFile,
@@ -26,8 +27,8 @@ class File {
   public uploadedBy!: number;
   public hash!: string;
   public _user!: TUser | null;
-  public createdAt!: string;
-  public updatedAt!: string;
+  public createdAt!: number;
+  public updatedAt!: number;
 
   private static parse(file: File | null): File | null {
     if (!file) return null;
@@ -190,6 +191,46 @@ class File {
     return query.all({ bucketId }).map(File.parse);
   }
 
+  static findDisposableFiles() {
+    const query = db
+      .query(
+        `
+      SELECT f.*
+      FROM files f
+      JOIN buckets b ON f.bucketId = b.id
+      WHERE b.retentionPolicy = '${RetentionPolicy.DISPOSE}'
+        AND (
+          (CAST(strftime('%s', 'now') AS INTEGER) - CAST(f.createdAt / 1000 AS INTEGER)) > b.retention
+        )
+    `
+      )
+      .as(File);
+
+    const disposableFiles = query.all();
+
+    return disposableFiles;
+  }
+
+  public isDisposable() {
+    const bucket = Bucket.findById(this.bucketId);
+
+    if (!bucket) {
+      throw new Error('Bucket not found');
+    }
+
+    if (
+      bucket.retentionPolicy !== RetentionPolicy.DISPOSE ||
+      !bucket.retention
+    ) {
+      return false;
+    }
+
+    const currentTime = Date.now();
+    const fileCreationTime = this.createdAt;
+
+    return currentTime - fileCreationTime > bucket.retention;
+  }
+
   static writeFile(
     data: ArrayBuffer,
     bucketId: number,
@@ -301,9 +342,11 @@ class File {
   }
 
   static deleteAllByBucketId(bucketId: number) {
-    const query = db.query('DELETE FROM files WHERE bucketId = $bucketId');
+    const files = File.findAllByBucketId(bucketId);
 
-    return query.run({ bucketId });
+    files.forEach((file) => {
+      file?.delete();
+    });
   }
 
   static findById(id: number | bigint) {

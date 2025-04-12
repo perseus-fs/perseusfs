@@ -222,7 +222,7 @@ class Bucket implements TBucket {
       quota: newData.quota ?? existingBucket.quota,
       customRead: newData.customRead ?? existingBucket.customRead,
       customWrite: newData.customWrite ?? existingBucket.customWrite,
-      retention: newData.retention ?? existingBucket.retention,
+      retention: bucket.retention ?? existingBucket.retention,
       quotaPolicy: newData.quotaPolicy ?? existingBucket.quotaPolicy,
       retentionPolicy:
         newData.retentionPolicy ?? existingBucket.retentionPolicy,

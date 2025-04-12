@@ -25,6 +25,7 @@
   "dependencies": {
     "@perseusfs/shared": "workspace:*",
     "chalk": "^5.4.1",
+    "croner": "^9.0.0",
     "file-type-mime": "^0.4.6",
     "jsonwebtoken": "^9.0.2",
     "sanitize-filename": "^1.6.3",

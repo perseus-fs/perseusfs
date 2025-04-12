@@ -1,8 +1,9 @@
-// console.clear();
+console.clear();
 loadContext();
 
 import { SettingKey } from '@perseusfs/shared';
 import chalk from 'chalk';
+import { loadCrons } from './crons';
 import { loadDb } from './database/db';
 import { Settings } from './database/models/settings';
 import { getResponseHeaders } from './helpers/get-response-headers';
@@ -17,6 +18,7 @@ import type { TCustomRequest } from './types';
 
 logLogo();
 await loadDb();
+loadCrons();
 patchInterface();
 
 const maxRequestBodySize = Settings.get(SettingKey.MAX_REQUEST_SIZE);

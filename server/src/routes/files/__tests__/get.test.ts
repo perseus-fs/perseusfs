@@ -1,6 +1,9 @@
+import { getRandomString } from '@perseusfs/shared';
+import { sleep } from 'bun';
 import { expect, test } from 'bun:test';
 import { TestContext } from '../../../__tests__/context';
 import { DEFAULT_FILE_CONTENT } from '../../../database/db';
+import { File } from '../../../database/models/file';
 
 test('Get default file', async () => {
   const response = await fetch(`${TestContext.baseUrl}/my-bucket/welcome.txt`, {
@@ -51,7 +54,7 @@ test('Bucket does not exist', async () => {
   expect(response.status).toBe(404);
 });
 
-test.only('Unauthenticated user tries to read from public read bucket', async () => {
+test('Unauthenticated user tries to read from public read bucket', async () => {
   const response = await fetch(`${TestContext.baseUrl}/my-bucket/welcome.txt`, {
     method: 'GET',
     headers: {
@@ -120,6 +123,48 @@ test('User with owner permission tries to read from his private read bucket', as
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${TestContext.loginTokens[3]}`
+    }
+  });
+
+  expect(response.ok).toBe(true);
+  expect(response.status).toBe(200);
+});
+
+test('User tries to get a file that should have been disposed', async () => {
+  const { currentPath } = File.writeFile(
+    TestContext.getStringAsArrayBuffer(500),
+    6,
+    undefined,
+    `${getRandomString(16)}.txt`
+  );
+
+  await sleep(6000);
+
+  const response = await fetch(`${TestContext.baseUrl}/${currentPath}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${TestContext.loginTokens[1]}`
+    }
+  });
+
+  expect(response.ok).toBe(false);
+  expect(response.status).toBe(404);
+});
+
+test('User tries to get a file that is not disposable yet', async () => {
+  const { currentPath } = File.writeFile(
+    TestContext.getStringAsArrayBuffer(500),
+    6,
+    undefined,
+    `${getRandomString(16)}.txt`
+  );
+
+  const response = await fetch(`${TestContext.baseUrl}/${currentPath}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${TestContext.loginTokens[1]}`
     }
   });
 
