@@ -147,9 +147,6 @@ const Settings = memo(() => {
           className="w-[300px]"
           disabled={isDemoLocked}
         />
-        {/* <span className="text-xs text-muted-foreground">
-          {filesize(values.requestLogsRetention ?? 0)}
-        </span> */}
         <span className="text-xs text-muted-foreground">
           {formatSeconds(values.requestLogsRetention ?? 0)}
         </span>
@@ -226,7 +223,7 @@ const Settings = memo(() => {
           <AlertTitle>Heads up!</AlertTitle>
           <AlertDescription>
             You changed the max request size. That setting will only be applied
-            after a server restart. server restart.
+            after a server restart
           </AlertDescription>
         </Alert>
       )}
