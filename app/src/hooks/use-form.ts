@@ -13,7 +13,11 @@ const useForm = (initialValues?: TGenericObject) => {
   );
 
   const r = useCallback(
-    (name: string, asNumber: boolean = false) => {
+    (
+      name: string,
+      asNumber: boolean = false,
+      onChange?: (value: string | number | boolean) => void
+    ) => {
       return {
         name,
         value: asNumber ? Number(values[name]) || 0 : (values[name] ?? ''),
@@ -22,6 +26,7 @@ const useForm = (initialValues?: TGenericObject) => {
             ? parseFloat(e.target.value) || 0
             : e.target.value;
           setValues((prev) => ({ ...prev, [name]: val }));
+          onChange?.(val);
         }
       };
     },

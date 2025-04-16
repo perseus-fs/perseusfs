@@ -71,6 +71,7 @@ const uploadFile = async (req: TCustomRequest, res: TRes, err: TErr) => {
   }
 
   const fileData = await req.arrayBuffer();
+
   const result = File.writeFile(fileData, bucketId, user?.id, fileName!);
 
   return res(result, 200);

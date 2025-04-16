@@ -355,6 +355,20 @@ class File {
     return File.parse(query.get({ id }));
   }
 
+  public getFullPath() {
+    const bucket = Bucket.findById(this.bucketId);
+
+    if (!bucket) {
+      throw new Error('Bucket not found');
+    }
+
+    return path.posix.join(bucket.name, this.getPath());
+  }
+
+  public getPath() {
+    return path.posix.join(this.path ?? '', this.name);
+  }
+
   public delete() {
     const file = File.findById(this.id);
 

@@ -59,16 +59,17 @@ class TestContext {
       bucketPermission.delete();
     }
 
-    BucketPermission.create({
+    const [bucketId] = BucketPermission.create({
       bucketId: permissionData.bucketId!,
       userId: permissionData.userId!,
       permission: permissionData.permission!
     });
 
-    const createdBucketPermission = BucketPermission.findByUserIdAndBucketId(
-      permissionData.bucketId!,
-      permissionData.userId!
-    );
+    if (!bucketId) {
+      throw new Error('Failed to create bucket permission');
+    }
+
+    const createdBucketPermission = BucketPermission.findById(bucketId);
 
     if (!createdBucketPermission) {
       throw new Error('Failed to create bucket permission');

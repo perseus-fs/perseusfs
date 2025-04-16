@@ -147,6 +147,7 @@ const loadMocks = () => {
 
   // make sure the secrets are always the same so we don't need to login all the time to get a valid token
   Statics.set(StaticKey.JWT_SECRET, 'talk quietly');
+  Statics.set(StaticKey.JWT_REFRESH_SECRET, 'and carry a big stick');
   Statics.set(StaticKey.SIGNED_URL_SECRET, 'its a secret');
 };
 

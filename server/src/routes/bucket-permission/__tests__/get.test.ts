@@ -2,7 +2,7 @@ import { BucketPermission } from '@perseusfs/shared';
 import { expect, test } from 'bun:test';
 import { TestContext } from '../../../__tests__/context';
 
-test.only('Get bucket permission', async () => {
+test('Get bucket permission', async () => {
   const response = await fetch(`${TestContext.baseUrl}/bucket_permissions/1`, {
     method: 'GET',
     headers: {

@@ -15,10 +15,11 @@ test('Login with default user', async () => {
 
   expect(response.ok).toBe(true);
 
-  const { token } = await response.json();
+  const { token, refreshToken } = await response.json();
 
   expect(response.status).toBe(200);
   expect(token).toBeDefined();
+  expect(refreshToken).toBeDefined();
 });
 
 test('Login with wrong password', async () => {
@@ -35,10 +36,11 @@ test('Login with wrong password', async () => {
 
   expect(response.ok).toBe(false);
 
-  const { errors, token } = await response.json();
+  const { errors, token, refreshToken } = await response.json();
 
   expect(response.status).toBe(401);
   expect(token).toBeUndefined();
+  expect(refreshToken).toBeUndefined();
   expect(errors).toBeDefined();
   expect(errors.password).toBeDefined();
 });
@@ -57,10 +59,11 @@ test('Login with non-existing user', async () => {
 
   expect(response.ok).toBe(false);
 
-  const { errors, token } = await response.json();
+  const { errors, token, refreshToken } = await response.json();
 
   expect(response.status).toBe(401);
   expect(token).toBeUndefined();
+  expect(refreshToken).toBeUndefined();
   expect(errors).toBeDefined();
   expect(errors.username).toBeDefined();
   expect(Object.keys(errors).length).toBe(1);
@@ -77,11 +80,12 @@ test('Login with no user/password', async () => {
 
   expect(response.ok).toBe(false);
 
-  const { errors, token } = await response.json();
+  const { errors, token, refreshToken } = await response.json();
 
   expect(response.status).toBe(401);
   expect(token).toBeUndefined();
   expect(errors).toBeDefined();
+  expect(refreshToken).toBeUndefined();
   expect(errors.username).toBeDefined();
   expect(errors.password).toBeDefined();
   expect(Object.keys(errors).length).toBe(2);

@@ -44,7 +44,7 @@ test('User with no access to bucket tries to get bucket', async () => {
   expect(response.status).toBe(403);
 });
 
-test.only('User with access to bucket tries to get bucket', async () => {
+test('User with access to bucket tries to get bucket', async () => {
   const response = await fetch(`${TestContext.baseUrl}/buckets/1`, {
     method: 'GET',
     headers: {
@@ -69,7 +69,7 @@ test.only('User with access to bucket tries to get bucket', async () => {
   expect(userPermissions.isOwner).toBe(false);
 });
 
-test.only('Owner tries to get bucket', async () => {
+test('Owner tries to get bucket', async () => {
   const response = await fetch(`${TestContext.baseUrl}/buckets/2`, {
     method: 'GET',
     headers: {

@@ -4,6 +4,7 @@ import { db } from '../db';
 
 type StaticTypes = {
   [StaticKey.JWT_SECRET]: string;
+  [StaticKey.JWT_REFRESH_SECRET]: string;
   [StaticKey.SIGNED_URL_SECRET]: string;
   [StaticKey.FIRST_START_VERSION]: string;
   [StaticKey.FIRST_START_DB_VERSION]: number;
@@ -12,6 +13,7 @@ type StaticTypes = {
 
 const types: { [K in keyof StaticTypes]: string } = {
   [StaticKey.JWT_SECRET]: 'string',
+  [StaticKey.JWT_REFRESH_SECRET]: 'string',
   [StaticKey.SIGNED_URL_SECRET]: 'string',
   [StaticKey.FIRST_START_VERSION]: 'string',
   [StaticKey.FIRST_START_DB_VERSION]: 'number',

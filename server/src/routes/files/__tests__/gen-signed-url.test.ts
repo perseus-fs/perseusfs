@@ -11,8 +11,7 @@ test('Tries to generate signed url', async () => {
       Authorization: `Bearer ${TestContext.loginTokens[1]}`
     },
     body: JSON.stringify({
-      bucketId: 1,
-      fileName: 'welcome.txt',
+      fileId: 1,
       expiresInSeconds: 3600
     })
   });
@@ -32,8 +31,7 @@ test('Unauthenticated user tries to generate signed url', async () => {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      bucketId: 1,
-      fileName: 'welcome.txt',
+      fileId: 1,
       expiresInSeconds: 3600
     })
   });
@@ -50,8 +48,7 @@ test('User with no read permission tries to generate signed url', async () => {
       Authorization: `Bearer ${TestContext.loginTokens[4]}`
     },
     body: JSON.stringify({
-      bucketId: 1,
-      fileName: 'welcome.txt',
+      fileId: 1,
       expiresInSeconds: 3600
     })
   });
@@ -68,8 +65,7 @@ test('User tries to generate signed url for non-existing file', async () => {
       Authorization: `Bearer ${TestContext.loginTokens[1]}`
     },
     body: JSON.stringify({
-      bucketId: 1,
-      fileName: 'non-existing-file.txt',
+      fileId: 9999,
       expiresInSeconds: 3600
     })
   });
@@ -78,25 +74,7 @@ test('User tries to generate signed url for non-existing file', async () => {
   expect(response.status).toBe(404);
 });
 
-test('User tries to generate signed url for non-existing bucket', async () => {
-  const response = await fetch(`${TestContext.baseUrl}/files/sign-url`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${TestContext.loginTokens[1]}`
-    },
-    body: JSON.stringify({
-      bucketId: 999,
-      fileName: 'welcome.txt',
-      expiresInSeconds: 3600
-    })
-  });
-
-  expect(response.ok).toBe(false);
-  expect(response.status).toBe(404);
-});
-
-test.only('Non super user tries to generate signed url when demo mode is enabled', async () => {
+test('Non super user tries to generate signed url when demo mode is enabled', async () => {
   Settings.set(SettingKey.DEMO_MODE, true);
 
   const response = await fetch(`${TestContext.baseUrl}/files/sign-url`, {
@@ -106,8 +84,7 @@ test.only('Non super user tries to generate signed url when demo mode is enabled
       Authorization: `Bearer ${TestContext.loginTokens[6]}`
     },
     body: JSON.stringify({
-      bucketId: 1,
-      fileName: 'welcome.txt',
+      fileId: 1,
       expiresInSeconds: 3600
     })
   });

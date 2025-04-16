@@ -2,6 +2,7 @@ import { adminOnly, authenticate } from '../../middlewares/authenticate';
 import { createBucket } from './create';
 import { deleteBucket } from './delete';
 import { getBucket } from './get';
+import { getBucketByName } from './get-by-name';
 import { getBucketPermissions } from './get-permissions';
 import { listBuckets } from './list';
 import { updateBucket } from './update';
@@ -27,6 +28,11 @@ export default [
     method: 'GET',
     path: '/buckets/:bucketId',
     handlers: [authenticate, getBucket]
+  },
+  {
+    method: 'GET',
+    path: '/buckets/by-name/:bucketName',
+    handlers: [authenticate, getBucketByName]
   },
   {
     method: 'GET',

@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export enum StaticKey {
   JWT_SECRET = "jwtSecret",
+  JWT_REFRESH_SECRET = "jwtRefreshSecret",
   SIGNED_URL_SECRET = "signedUrlSecret",
   FIRST_START_DATE = "firstStartDate",
   FIRST_START_VERSION = "firstStartVersion",
@@ -10,6 +11,7 @@ export enum StaticKey {
 
 const ZedStatics = z.object({
   [StaticKey.JWT_SECRET]: z.string().min(1),
+  [StaticKey.JWT_REFRESH_SECRET]: z.string().min(1),
   [StaticKey.SIGNED_URL_SECRET]: z.string().min(1),
   [StaticKey.FIRST_START_DATE]: z.number().int().nonnegative(),
   [StaticKey.FIRST_START_VERSION]: z.string().min(1),

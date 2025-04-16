@@ -35,16 +35,25 @@ const userLogin = async (req: TCustomRequest, res: TRes, err: TErr) => {
 
   const token = jwt.sign(
     {
-      id: user?.id,
-      email: user?.email
+      id: user?.id
     },
     Statics.get(StaticKey.JWT_SECRET),
     {
-      expiresIn: '30d'
+      expiresIn: '7d'
     }
   );
 
-  return res({ token });
+  const refreshToken = jwt.sign(
+    {
+      id: user?.id
+    },
+    Statics.get(StaticKey.JWT_REFRESH_SECRET),
+    {
+      expiresIn: '365d'
+    }
+  );
+
+  return res({ token, refreshToken });
 };
 
 export { userLogin };

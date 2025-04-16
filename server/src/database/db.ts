@@ -122,6 +122,7 @@ const populateDb = () => {
   Settings.set(SettingKey.REQUEST_LOGS_RETENTION, 14 * 24 * 60 * 60); // 14 days
 
   Statics.set(StaticKey.JWT_SECRET, randomUUIDv7());
+  Statics.set(StaticKey.JWT_REFRESH_SECRET, randomUUIDv7());
   Statics.set(StaticKey.SIGNED_URL_SECRET, randomUUIDv7());
   Statics.set(StaticKey.FIRST_START_VERSION, Settings.buildInfo.version);
   Statics.set(

@@ -6,14 +6,12 @@ import { generateSignedUrl } from '../../helpers/signed';
 import type { TCustomRequest, TErr, TRes } from '../../types';
 
 type TCreateBucketBody = {
-  bucketId: string;
-  fileName: string;
+  fileId: number;
   expiresInSeconds: number;
 };
 
 const bodySchema = z.object({
-  bucketId: z.number().min(1),
-  fileName: z.string().nonempty(),
+  fileId: z.number().min(1),
   expiresInSeconds: z.number().min(1)
 });
 
@@ -25,18 +23,18 @@ const signUrl = async (req: TCustomRequest, res: TRes, err: TErr) => {
     return err(errors, 400);
   }
 
-  const { bucketId, fileName, expiresInSeconds } = body;
+  const { fileId, expiresInSeconds } = body;
 
-  const bucket = Bucket.findById(+bucketId);
-
-  if (!bucket) {
-    return err({ bucketId: 'Not found' }, 404);
-  }
-
-  const file = File.findByBucketAndKey(bucket.id, fileName);
+  const file = File.findById(fileId);
 
   if (!file) {
     return err({ fileName: 'Not found' }, 404);
+  }
+
+  const bucket = Bucket.findById(file?.bucketId);
+
+  if (!bucket) {
+    return err({ bucketId: 'Not found' }, 404);
   }
 
   const { readPermission } =
@@ -46,7 +44,11 @@ const signUrl = async (req: TCustomRequest, res: TRes, err: TErr) => {
     return err({ bucketId: 'Forbidden' }, 403);
   }
 
-  const signedUrl = generateSignedUrl(bucket.name, fileName, expiresInSeconds);
+  const signedUrl = generateSignedUrl(
+    bucket.name,
+    file.getPath(),
+    expiresInSeconds
+  );
 
   return res({
     signedUrl

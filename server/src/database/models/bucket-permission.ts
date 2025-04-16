@@ -157,7 +157,7 @@ class BucketPermission {
     return query.run({ bucketId });
   }
 
-  static findById(id: number) {
+  static findById(id: number | bigint) {
     const query = db
       .query(
         `SELECT bucket_permissions.*,

@@ -1,5 +1,6 @@
 import { CodeEditor } from '@/components/code-editor';
 import { LoadingSection } from '@/components/loading-section';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Group } from '@/components/ui/group';
 import { Input } from '@/components/ui/input';
@@ -13,6 +14,7 @@ import { useSettings } from '@/hooks/use-settings';
 import { useToken } from '@/hooks/use-token';
 import { javascript } from '@codemirror/lang-javascript';
 import { filesize } from 'filesize';
+import { AlertCircle } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import {
@@ -28,6 +30,7 @@ const Settings = memo(() => {
   const isDemoLocked = useIsDemoModeLocked();
   const { settings, loading: loadingData } = useSettings();
   const [loading, setLoading] = useState(false);
+  const [changedMaxRequestSize, setChangedMaxRequestSize] = useState(false);
 
   const parsedSettings = useMemo(() => {
     return {
@@ -96,11 +99,13 @@ const Settings = memo(() => {
         className="flex items-center gap-2"
         label="Max Request Size"
         error={errors.maxRequestSize}
-        description="The maximum size of a request body in bytes. This ultimately will limit the size of files that can be uploaded. Set to 0 for no limit. Setting a very small value will prevent you from using the API as a whole."
+        description="The maximum size of a request body in bytes. This ultimately will limit the size of files that can be uploaded. Set to 0 for no limit. Setting a very small value will prevent you from using the API as a whole. Will only be applied after a restart."
         required
       >
         <Input
-          {...r('maxRequestSize', true)}
+          {...r('maxRequestSize', true, () => {
+            setChangedMaxRequestSize(true);
+          })}
           type="number"
           className="w-[300px]"
           disabled={isDemoLocked}
@@ -214,6 +219,17 @@ const Settings = memo(() => {
           </span>
         </div>
       </Group>
+
+      {changedMaxRequestSize && (
+        <Alert className="mt-4 mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Heads up!</AlertTitle>
+          <AlertDescription>
+            You changed the max request size. That setting will only be applied
+            after a server restart. server restart.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div>
         <Button onClick={onSubmitHandler} disabled={loading || isDemoLocked}>

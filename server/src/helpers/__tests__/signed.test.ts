@@ -38,8 +38,6 @@ test('Sign and validate URL', async () => {
   ).toBeFalse();
 });
 
-// New Tests
-
 test('Expired signed URL should fail validation', async () => {
   const url = generateSignedUrl('bucketName', 'expired-file.txt', -10);
 
