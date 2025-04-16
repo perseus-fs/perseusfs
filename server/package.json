@@ -2,7 +2,7 @@
   "name": "@perseusfs/server",
   "module": "app.ts",
   "type": "module",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "scripts": {
     "dev": "bun --bun run --watch ./src/app.ts",
     "format": "prettier --write \"**/*.ts*\" --config ./.prettierrc.json",
