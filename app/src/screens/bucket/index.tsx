@@ -78,7 +78,7 @@ const columns: ColumnDef<TFile>[] = [
       ) : null;
 
       return (
-        <div className="lowercase text-left">
+        <div className="lowercase text-left truncate">
           {pathComp}
           {row.getValue('name')}
         </div>
