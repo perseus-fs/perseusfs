@@ -1,3 +1,4 @@
+import { Settings } from '../database/models/settings';
 import { getResponseHeaders } from '../helpers/get-response-headers';
 import type { TErrors, TGenericObject } from '../types';
 
@@ -48,6 +49,10 @@ const handleRoute = async (
       headers: getResponseHeaders()
     });
   } catch (error: any) {
+    if (Settings.debug) {
+      console.error(error);
+    }
+
     return new Response(
       JSON.stringify({ error: error?.toString?.() ?? 'Something went wrong.' }),
       {
