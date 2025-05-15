@@ -1,3 +1,4 @@
+import { invalidateUser } from '@/actions/app';
 import { UserCrud } from '@/components/user-crud';
 import { getApiUrl } from '@/helpers/get-api-url';
 import { useToken } from '@/hooks/use-token';
@@ -43,6 +44,8 @@ const UpdateUser = memo(() => {
       }
 
       toast.success('User updated successfully');
+
+      invalidateUser(values.id!);
     },
     [token, id]
   );

@@ -15,6 +15,19 @@ export const invalidateBucket = (bucketId: number) => {
   });
 };
 
+export const invalidateUsers = () => {
+  queryClient.invalidateQueries({
+    queryKey: ['users']
+  });
+};
+
+export const invalidateUser = (userId: number) => {
+  invalidateUsers();
+  queryClient.invalidateQueries({
+    queryKey: ['user', userId]
+  });
+};
+
 export const setDemoMode = (demoMode: boolean) => {
   store.dispatch(appSliceActions.setDemoMode(demoMode));
 };

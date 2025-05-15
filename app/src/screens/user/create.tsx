@@ -1,3 +1,4 @@
+import { invalidateUser } from '@/actions/app';
 import { UserCrud } from '@/components/user-crud';
 import { getApiUrl } from '@/helpers/get-api-url';
 import { useToken } from '@/hooks/use-token';
@@ -33,6 +34,8 @@ const CreateUser = memo(() => {
       }
 
       toast.success('User created successfully');
+
+      invalidateUser(values.id!);
       navigate('/users');
     },
     [token, navigate]

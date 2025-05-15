@@ -1,40 +1,46 @@
 import { getApiUrl } from '@/helpers/get-api-url';
-import { TUser } from '@perseusfs/shared';
-import { useCallback, useEffect, useState } from 'react';
+import { DEFAULT_QUERY_CACHE } from '@/statics';
+import { useQuery } from '@tanstack/react-query';
 import { useToken } from './use-token';
 
+const fetchUsers = async (token: string | undefined) => {
+  if (!token) throw new Error('Invalid token');
+
+  const response = await fetch(`${getApiUrl()}/users`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch users');
+  }
+
+  const data = await response.json();
+
+  return {
+    users: data.users ?? []
+  };
+};
+
 const useUsers = () => {
-  const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState<TUser[]>([]);
   const token = useToken();
 
-  const loadBuckets = useCallback(async () => {
-    setLoading(true);
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ['users'],
+    queryFn: () => fetchUsers(token),
+    enabled: !!token,
+    staleTime: DEFAULT_QUERY_CACHE
+  });
 
-    const response = await fetch(`${getApiUrl()}/users`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    setLoading(false);
-
-    if (!response.ok) {
-      return;
-    }
-
-    const data = await response.json();
-
-    setUsers(data.users);
-  }, [token]);
-
-  useEffect(() => {
-    loadBuckets();
-  }, [loadBuckets]);
-
-  return { loading, users, refetch: loadBuckets };
+  return {
+    loading: isLoading,
+    users: data?.users ?? [],
+    isError,
+    refetch
+  };
 };
 
 export { useUsers };
