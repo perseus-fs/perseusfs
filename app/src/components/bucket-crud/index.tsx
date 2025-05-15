@@ -63,7 +63,9 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
     <Tabs defaultValue="bucket" className="w-[400px]">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="bucket">Bucket</TabsTrigger>
-        <TabsTrigger value="permissions">Permissions</TabsTrigger>
+        <TabsTrigger value="permissions" disabled={!isUpdate}>
+          Permissions
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="bucket" className="w-full">
         <div className="flex flex-col w-full gap-2">
