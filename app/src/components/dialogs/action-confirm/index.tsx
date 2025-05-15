@@ -34,7 +34,9 @@ const ActionConfirmDialog = memo(
       <AlertDialog {...dialogProps}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{title}</AlertDialogTitle>
+            <AlertDialogTitle className="block max-w-[460px] truncate">
+              {title}
+            </AlertDialogTitle>
             <AlertDialogDescription>{message}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
