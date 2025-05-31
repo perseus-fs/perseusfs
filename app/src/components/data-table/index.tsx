@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table';
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { LoadingSection } from '../loading-section';
 import { Input } from '../ui/input';
 import {
@@ -100,6 +100,16 @@ const DataTableRoot = <T,>({
     meta,
     enableMultiRowSelection: true
   });
+
+  useEffect(() => {
+    // reset pagination and row selection when data changes
+    setRowSelection({});
+    onSelectedRowIdsChange?.([]);
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: 0
+    }));
+  }, [data, setPagination, onSelectedRowIdsChange]);
 
   return (
     <div className="flex flex-col gap-4">
