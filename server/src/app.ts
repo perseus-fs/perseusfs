@@ -46,9 +46,12 @@ const server = Bun.serve({
     }
 
     if (url.pathname === '/') {
-      return new Response('Hello, World!', {
-        headers: getResponseHeaders()
-      });
+      return new Response(
+        `Hello from PerseusFS v${Settings.buildInfo.version}`,
+        {
+          headers: getResponseHeaders()
+        }
+      );
     }
 
     const matchedHandlers = matchRoute(req as TCustomRequest, routes);

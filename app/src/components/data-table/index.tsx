@@ -3,6 +3,7 @@ import {
   ColumnDef,
   ColumnFiltersState,
   PaginationState,
+  RowSelectionState,
   SortingState,
   VisibilityState,
   flexRender,
@@ -37,6 +38,9 @@ type TDataTableProps<T> = {
   actions?: React.ReactNode;
   meta?: TGenericObject;
   searchKey?: string;
+  onSelectedRowIdsChange?: (number: number[]) => void;
+  selectedRowIds?: number[];
+  multiSelectionSlot?: (selectedRowIds: number[]) => React.ReactNode;
 };
 
 const DataTableRoot = <T,>({
@@ -48,13 +52,17 @@ const DataTableRoot = <T,>({
   loading,
   actions,
   meta,
-  searchKey
+  searchKey,
+  onSelectedRowIdsChange,
+  selectedRowIds,
+  multiSelectionSlot
 }: TDataTableProps<T>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  const table = useReactTable({
+  const table = useReactTable<T>({
     data: data,
     columns,
     onSortingChange: setSorting,
@@ -65,13 +73,32 @@ const DataTableRoot = <T,>({
     getFilteredRowModel: getFilteredRowModel(),
     onPaginationChange: setPagination,
     getPaginationRowModel: getPaginationRowModel(),
+    onRowSelectionChange: (updater) => {
+      setRowSelection((prev) => {
+        const next = typeof updater === 'function' ? updater(prev) : updater;
+
+        const selectedRows = table
+          .getRowModel()
+          .rows.filter((row) => next[row.id]);
+
+        const selectedRowIds = selectedRows
+          .map((row) => (row.original as { id: number } | undefined)?.id)
+          .filter((id): id is number => id !== undefined);
+
+        onSelectedRowIdsChange?.(selectedRowIds);
+
+        return next;
+      });
+    },
     state: {
       sorting,
       columnFilters,
       columnVisibility,
-      pagination
+      pagination,
+      rowSelection
     },
-    meta
+    meta,
+    enableMultiRowSelection: true
   });
 
   return (
@@ -98,6 +125,8 @@ const DataTableRoot = <T,>({
           pageCount={table.getPageCount()}
           refetch={refetch}
           pageSize={pagination.pageSize}
+          selectedRowIds={selectedRowIds}
+          multiSelectionSlot={multiSelectionSlot}
         />
         {actions && <div>{actions}</div>}
       </div>
@@ -172,6 +201,8 @@ const DataTableRoot = <T,>({
         pageCount={table.getPageCount()}
         refetch={refetch}
         pageSize={pagination.pageSize}
+        selectedRowIds={selectedRowIds}
+        multiSelectionSlot={multiSelectionSlot}
       />
     </div>
   );

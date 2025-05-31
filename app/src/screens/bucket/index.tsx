@@ -27,6 +27,7 @@ import { memo, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { toast } from 'sonner';
 import { Header } from './header';
+import { MultiSelectActions } from './multi-selection-actions';
 
 const columns: ColumnDef<TFile>[] = [
   {
@@ -258,6 +259,7 @@ const columns: ColumnDef<TFile>[] = [
 
 const Bucket = memo(() => {
   const isDemoLocked = useIsDemoModeLocked();
+  const [selectedRowIds, setSelectedRowIds] = useState<number[]>([]);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: DEFAULT_PAGE_SIZE
@@ -280,6 +282,8 @@ const Bucket = memo(() => {
     }),
     [bucket, refetch, isDemoLocked]
   );
+
+  console.log('selectedRowIds:', selectedRowIds);
 
   if (loading) {
     return <LoadingSection />;
@@ -306,6 +310,14 @@ const Bucket = memo(() => {
         loading={loading}
         meta={meta}
         searchKey="name"
+        onSelectedRowIdsChange={setSelectedRowIds}
+        selectedRowIds={selectedRowIds}
+        multiSelectionSlot={(selectedRowIds) => (
+          <MultiSelectActions
+            selectedRowIds={selectedRowIds}
+            refetch={refetch}
+          />
+        )}
       />
     </div>
   );

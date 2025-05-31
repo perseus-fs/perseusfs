@@ -16,10 +16,20 @@ type TPaginationProps = {
   pageCount: number;
   pageSize: number;
   refetch?: () => void;
+  selectedRowIds?: number[];
+  multiSelectionSlot?: (selectedRowIds: number[]) => React.ReactNode;
 };
 
 const Pagination = memo(
-  ({ table, pageIndex, pageCount, refetch, pageSize }: TPaginationProps) => {
+  ({
+    table,
+    pageIndex,
+    pageCount,
+    refetch,
+    pageSize,
+    selectedRowIds,
+    multiSelectionSlot
+  }: TPaginationProps) => {
     const onRefresh = useCallback(async () => {
       if (!refetch) return;
 
@@ -78,6 +88,12 @@ const Pagination = memo(
           perPage={pageSize}
           setPerPage={(perPage) => table.setPageSize(perPage)}
         />
+
+        {multiSelectionSlot && (
+          <div className="flex items-center gap-2">
+            {multiSelectionSlot(selectedRowIds ?? [])}
+          </div>
+        )}
       </div>
     );
   }
