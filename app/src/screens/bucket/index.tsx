@@ -283,8 +283,6 @@ const Bucket = memo(() => {
     [bucket, refetch, isDemoLocked]
   );
 
-  console.log('selectedRowIds:', selectedRowIds);
-
   if (loading) {
     return <LoadingSection />;
   }
