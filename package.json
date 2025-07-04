@@ -2,7 +2,9 @@
   "name": "perseusfs",
   "version": "0.0.2",
   "scripts": {
-    "build": "bun --bun ./scripts/build.ts"
+    "build": "bun --bun ./scripts/build.ts",
+    "dev:server": "bun --bun run --cwd server dev",
+    "dev:app": "bun --bun run --cwd app dev"
   },
   "workspaces": [
     "server",

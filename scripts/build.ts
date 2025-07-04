@@ -1,7 +1,12 @@
 import fs from "fs";
 import path from "path";
 import { parseArgs } from "util";
-import { compile, execAsync, patchPackageJsonVersion } from "./helpers";
+import {
+  compile,
+  execAsync,
+  patchPackageJsonVersion,
+  patchReadMe,
+} from "./helpers";
 import semver from "semver";
 
 const { values } = parseArgs({
@@ -42,15 +47,17 @@ if (!!values.bump) {
     `Bumping version from ${packageJson.version} to ${newVersion} (type: ${values.bump})`
   );
 
-  [
+  const promises = [
     rootPackageJson,
     interfacePackageJson,
     serverPackageJson,
     sharedPackageJson,
-  ].forEach((packageJsonPath) => {
-    patchPackageJsonVersion(packageJsonPath, newVersion);
+  ].map(async (packageJsonPath) => {
+    await patchPackageJsonVersion(packageJsonPath, newVersion);
   });
 }
+
+await patchReadMe();
 
 const DEV_BUILD_INFO = {
   buildTime: 0,

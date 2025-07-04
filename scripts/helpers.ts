@@ -1,5 +1,5 @@
 import { spawn } from "bun";
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 import AdmZip from "adm-zip";
 
@@ -24,22 +24,48 @@ const execAsync = async (command: string[], options?: {}): Promise<void> => {
 };
 
 const patchPackageJsonVersion = async (path: string, version: string) => {
-  const packageJsonStr = fs.readFileSync(path, "utf-8");
+  const packageJsonStr = await fs.readFile(path, "utf-8");
   const packageJson = JSON.parse(packageJsonStr);
 
   packageJson.version = version;
 
-  fs.writeFileSync(path, JSON.stringify(packageJson, null, 2));
+  await fs.writeFile(path, JSON.stringify(packageJson, null, 2));
 };
 
-const cleanBuildFolder = (targetPath: string) => {
-  fs.readdirSync(targetPath).forEach((file) => {
-    const filePath = path.join(targetPath, file);
+const patchReadMe = async () => {
+  const filePath = path.resolve(process.cwd(), "README.md");
+  const readme = await fs.readFile(filePath, "utf-8");
+  const bunVersion = await getBunVersion();
 
-    if (fs.statSync(filePath).isFile() && !filePath.endsWith(".gitkeep")) {
-      fs.unlinkSync(filePath);
-    }
-  });
+  const updated = readme.replace(
+    /(<img\s+src="https:\/\/img\.shields\.io\/badge\/Bun-)(\d+\.\d+\.\d+)(-orange")/,
+    `$1${bunVersion}$3`
+  );
+
+  if (updated === readme) {
+    console.log("No changes made to README.md (badge already up to date).");
+    return;
+  }
+
+  await fs.writeFile(filePath, updated, "utf-8");
+  console.log(`README.md updated with Bun version ${bunVersion}`);
+};
+
+const cleanBuildFolder = async (targetPath: string) => {
+  const files = await fs.readdir(targetPath);
+
+  await Promise.all(
+    files.map(async (file) => {
+      const filePath = path.join(targetPath, file);
+
+      if (
+        (await fs.stat(filePath)).isFile() &&
+        !filePath.endsWith(".gitkeep")
+      ) {
+        await fs.unlink(filePath);
+      }
+    })
+  );
 };
 
 const compile = async (
@@ -53,7 +79,7 @@ const compile = async (
   const buildPath = path.join(serverPath, "build");
   const zipPath = path.join(exportsPath, zipName);
 
-  cleanBuildFolder(buildPath);
+  await cleanBuildFolder(buildPath);
 
   console.log(`Compiling server for ${target}...`);
 
@@ -83,4 +109,16 @@ const compile = async (
   return zipPath;
 };
 
-export { execAsync, patchPackageJsonVersion, compile };
+const getBunVersion = () => {
+  const bunVersion = process.versions.bun;
+
+  if (!bunVersion) {
+    throw new Error(
+      "Bun is not installed or not available in the environment."
+    );
+  }
+
+  return bunVersion;
+};
+
+export { execAsync, patchPackageJsonVersion, compile, patchReadMe };
