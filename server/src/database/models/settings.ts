@@ -140,15 +140,6 @@ class Settings {
     `);
   }
 
-  public createTable() {
-    db.exec(`
-      CREATE TABLE settings (
-        key TEXT PRIMARY KEY,
-        value TEXT NOT NULL
-      );
-    `);
-  }
-
   public dropTable() {
     db.exec('DROP TABLE IF EXISTS settings');
   }

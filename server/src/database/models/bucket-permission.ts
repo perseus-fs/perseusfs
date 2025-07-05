@@ -31,22 +31,6 @@ class BucketPermission {
     });
   }
 
-  static createTable() {
-    db.exec(`
-      CREATE TABLE bucket_permissions (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          bucketId INTEGER NOT NULL,
-          userId INTEGER NOT NULL,
-          permission TEXT NOT NULL CHECK (permission IN ('owner', 'read', 'write', 'read-write')),
-          createdAt INTEGER NOT NULL,
-          updatedAt INTEGER NOT NULL,
-          FOREIGN KEY (bucketId) REFERENCES buckets(id) ON DELETE CASCADE,
-          FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
-          UNIQUE (bucketId, userId)
-      );
-    `);
-  }
-
   static dropTable() {
     db.exec('DROP TABLE IF EXISTS bucket_permissions');
   }

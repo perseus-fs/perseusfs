@@ -19,22 +19,6 @@ class RequestLog implements TRequestLog {
   public country!: string | null;
   public createdAt!: number;
 
-  static createTable() {
-    db.exec(`
-      CREATE TABLE request_logs (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          method TEXT NOT NULL,
-          address TEXT NOT NULL,
-          host TEXT,
-          path TEXT NOT NULL,
-          status INTEGER NOT NULL,
-          time FLOAT NOT NULL,
-          country TEXT,
-          createdAt INTEGER NOT NULL
-      );
-    `);
-  }
-
   static dropTable() {
     db.exec('DROP TABLE IF EXISTS request_logs');
   }

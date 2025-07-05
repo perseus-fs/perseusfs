@@ -94,27 +94,6 @@ class File {
     return candidate;
   }
 
-  static createTable() {
-    db.exec(`
-      CREATE TABLE files (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          bucketId INTEGER NOT NULL,
-          name TEXT NOT NULL,
-          originalName TEXT NOT NULL,
-          path TEXT,
-          size INTEGER NOT NULL,
-          contentType TEXT NOT NULL,
-          uploadedBy INTEGER NULL,
-          hash TEXT,
-          createdAt INTEGER NOT NULL,
-          updatedAt INTEGER NOT NULL,
-          FOREIGN KEY (bucketId) REFERENCES buckets(id) ON DELETE CASCADE,
-          FOREIGN KEY (uploadedBy) REFERENCES users(id) ON DELETE CASCADE,
-          UNIQUE (bucketId, name)
-      );
-    `);
-  }
-
   static dropTable() {
     db.exec('DROP TABLE IF EXISTS files');
   }

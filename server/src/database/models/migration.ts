@@ -14,18 +14,6 @@ class Migration {
   public executedAt!: number;
   public error!: string | null;
 
-  public static createTable() {
-    db.exec(`
-      CREATE TABLE migrations (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL,
-          version NUMBER NOT NULL,
-          executedAt INTEGER NOT NULL,
-          error TEXT
-      );
-    `);
-  }
-
   public static dropTable() {
     db.exec('DROP TABLE IF EXISTS migrations');
   }

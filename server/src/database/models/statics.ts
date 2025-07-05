@@ -25,15 +25,6 @@ class Statics {
 
   constructor() {}
 
-  public createTable() {
-    db.exec(`
-      CREATE TABLE statics (
-        key TEXT PRIMARY KEY,
-        value TEXT NOT NULL
-      );
-    `);
-  }
-
   public dropTable() {
     db.exec('DROP TABLE IF EXISTS statics');
   }

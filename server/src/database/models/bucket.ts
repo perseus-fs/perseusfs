@@ -29,25 +29,6 @@ class Bucket implements TBucket {
   public createdAt!: number;
   public updatedAt!: number;
 
-  public static createTable() {
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS buckets (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT UNIQUE NOT NULL,
-        read TEXT NOT NULL,
-        write TEXT NOT NULL,
-        customRead TEXT,
-        customWrite TEXT,
-        quota INTEGER,
-        retention INTEGER,
-        quotaPolicy TEXT,
-        retentionPolicy TEXT,
-        createdAt INTEGER NOT NULL,
-        updatedAt INTEGER NOT NULL
-      );
-    `);
-  }
-
   public static dropTable() {
     db.exec('DROP TABLE IF EXISTS buckets');
   }

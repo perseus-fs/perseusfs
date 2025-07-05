@@ -22,21 +22,6 @@ class User implements TUser {
   public createdAt!: number;
   public updatedAt!: number;
 
-  static createTable() {
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT UNIQUE NOT NULL,
-        email TEXT UNIQUE DEFAULT NULL,
-        role TEXT NOT NULL DEFAULT '${UserRole.USER}',
-        password TEXT NOT NULL,
-        lastSeen INTEGER DEFAULT NULL,
-        createdAt INTEGER NOT NULL,
-        updatedAt INTEGER NOT NULL
-      );
-    `);
-  }
-
   static dropTable() {
     db.exec('DROP TABLE IF EXISTS users');
   }
