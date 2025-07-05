@@ -55,6 +55,8 @@ if (!!values.bump) {
   ].map(async (packageJsonPath) => {
     await patchPackageJsonVersion(packageJsonPath, newVersion);
   });
+
+  await Promise.all(promises);
 }
 
 await patchReadMe();

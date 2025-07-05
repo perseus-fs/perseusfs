@@ -20,6 +20,8 @@ import { RequestLog } from './models/request-log';
 import { Settings } from './models/settings';
 import { Statics } from './models/statics';
 import { User } from './models/user';
+// @ts-expect-error any
+import schema from './schema.sql' with { type: 'file' };
 
 const TESTING_IN_MEMORY = true;
 
@@ -33,6 +35,12 @@ export const DB_PATH =
     ? ':memory:'
     : path.join(DATA_PATH, 'data.sqlite');
 export const DEFAULT_FILE_CONTENT = 'Hello, World!';
+
+const getDatabaseSchema = async () => {
+  const file = Bun.file(schema);
+
+  return await file.text();
+};
 
 const ensureDirs = () => {
   const directories = [DATA_PATH, BUCKETS_PATH];
@@ -85,7 +93,11 @@ const stringAsArrayBuffer = (str: string): ArrayBuffer => {
   return encoder.encode(str).buffer as ArrayBuffer;
 };
 
-const populateDb = () => {
+const populateDb = async () => {
+  const schema = await getDatabaseSchema();
+
+  db.exec(schema);
+
   const defaultBucket = 'my-bucket';
   const defaultUser = 'admin';
   const password =
@@ -154,17 +166,6 @@ const populateDb = () => {
   );
 };
 
-const createTables = () => {
-  Migration.createTable();
-  User.createTable();
-  Bucket.createTable();
-  BucketPermission.createTable();
-  File.createTable();
-  RequestLog.createTable();
-  Settings.createTable();
-  Statics.createTable();
-};
-
 const dropAllTables = () => {
   Migration.dropTable();
   User.dropTable();
@@ -180,8 +181,7 @@ const loadDb = async () => {
   const isInited = isDbInited();
 
   if (!isInited) {
-    createTables();
-    populateDb();
+    await populateDb();
   }
 
   if (Settings.regenCredentials) {
