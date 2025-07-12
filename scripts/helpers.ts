@@ -88,6 +88,7 @@ const compile = async (
       "bun",
       "build",
       "--compile",
+      "--minify",
       `--target=${target}`,
       "--outfile",
       "./build/perseusfs",
