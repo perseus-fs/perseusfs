@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { downloadFile } from '@/helpers/download-file';
 import { getApiUrl } from '@/helpers/get-api-url';
 import { getFileUrl } from '@/helpers/get-file-url';
 import { useBucket } from '@/hooks/use-bucket';
@@ -202,8 +203,16 @@ const columns: ColumnDef<TFile>[] = [
         }
       };
 
-      const onDownloadClick = () => {
+      const onOpenInNewTab = () => {
         window.open(getFileUrl(bucket.name, file.name, file.path));
+      };
+
+      const onDownloadClick = async () => {
+        const url = getFileUrl(bucket.name, file.name, file.path);
+
+        console.log('! Downloading file from URL:', url);
+
+        await downloadFile(url, file.name);
       };
 
       const onCopyDirectLinkClick = () => {
@@ -239,6 +248,9 @@ const columns: ColumnDef<TFile>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onDownloadClick}>
               Download
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onOpenInNewTab}>
+              Open in new tab
             </DropdownMenuItem>
             <DropdownMenuItem onClick={onShareClick} disabled={isDemoLocked}>
               Share
