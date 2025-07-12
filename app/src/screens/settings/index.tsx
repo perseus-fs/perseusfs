@@ -90,6 +90,13 @@ const Settings = memo(() => {
     [onFieldChange]
   );
 
+  const onChangeDemoMode = useCallback(
+    (value: boolean) => {
+      onFieldChange('demoMode', value);
+    },
+    [onFieldChange]
+  );
+
   if (!isPopulated) {
     return null;
   }
@@ -211,7 +218,7 @@ const Settings = memo(() => {
             id="demo-mode"
             disabled={!isSuperUser || isDemoLocked}
             checked={values.demoMode}
-            onCheckedChange={(value) => onFieldChange('demoMode', value)}
+            onCheckedChange={onChangeDemoMode}
           />
           <span className="text-sm text-muted-foreground">
             {values.demoMode ? 'Enabled' : 'Disabled'}

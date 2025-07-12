@@ -68,6 +68,20 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
     [onFieldChange]
   );
 
+  const onChangeCustomRead = useCallback(
+    (value: string) => {
+      onFieldChange('customRead', value);
+    },
+    [onFieldChange]
+  );
+
+  const onChangeCustomWrite = useCallback(
+    (value: string) => {
+      onFieldChange('customWrite', value);
+    },
+    [onFieldChange]
+  );
+
   if (!isPopulated) {
     return null;
   }
@@ -117,7 +131,7 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
                 height="200px"
                 width="1000px"
                 extensions={[javascript()]}
-                onChange={(value) => onFieldChange('customRead', value)}
+                onChange={onChangeCustomRead}
                 value={CODE_READ_BOILERPLATE}
                 readOnly={isDemoLocked}
               />
@@ -162,7 +176,7 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
                 width="1000px"
                 extensions={[javascript()]}
                 value={CODE_WRITE_BOILERPLATE}
-                onChange={(value) => onFieldChange('customWrite', value)}
+                onChange={onChangeCustomWrite}
                 readOnly={isDemoLocked}
               />
             </Group>
