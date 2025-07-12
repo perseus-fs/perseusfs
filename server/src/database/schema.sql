@@ -20,6 +20,7 @@ CREATE TABLE buckets (
     retention INTEGER,
     quotaPolicy TEXT,
     retentionPolicy TEXT,
+    extraHeaders TEXT DEFAULT '{}',
     createdAt INTEGER NOT NULL,
     updatedAt INTEGER NOT NULL
 );

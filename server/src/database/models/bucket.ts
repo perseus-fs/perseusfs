@@ -26,11 +26,24 @@ class Bucket implements TBucket {
   public quota!: number | null;
   public retentionPolicy!: RetentionPolicy;
   public retention!: number | null;
+  public extraHeaders!: Record<string, string>;
   public createdAt!: number;
   public updatedAt!: number;
 
   public static dropTable() {
     db.exec('DROP TABLE IF EXISTS buckets');
+  }
+
+  private static parse(bucket: Bucket | null): Bucket | null {
+    if (!bucket) return null;
+
+    const parsedExtraHeaders = JSON.parse(
+      bucket.extraHeaders.toString() || '{}'
+    );
+
+    return Object.assign(new Bucket(), bucket, {
+      extraHeaders: parsedExtraHeaders
+    });
   }
 
   public static getCount() {
@@ -45,14 +58,16 @@ class Bucket implements TBucket {
 
   public static findById(bucketId: number) {
     const query = db.query('SELECT * FROM buckets WHERE id = $id').as(Bucket);
+    const bucket = query.get({ id: bucketId });
 
-    return query.get({ id: bucketId });
+    return Bucket.parse(bucket);
   }
 
   public static findAll() {
     const query = db.query('SELECT * FROM buckets').as(Bucket);
+    const buckets = query.all();
 
-    return query.all();
+    return buckets.map(Bucket.parse);
   }
 
   public static findAllByUserId(userId: number | undefined) {
@@ -82,15 +97,18 @@ class Bucket implements TBucket {
       )
       .as(Bucket);
 
-    return query.all({ userId });
+    const buckets = query.all({ userId });
+
+    return buckets.map(Bucket.parse);
   }
 
   public static findByName(name: string) {
     const query = db
       .query('SELECT * FROM buckets WHERE name = $name')
       .as(Bucket);
+    const bucket = query.get({ name });
 
-    return query.get({ name });
+    return Bucket.parse(bucket);
   }
 
   public static getPath(name: string) {
@@ -112,11 +130,37 @@ class Bucket implements TBucket {
 
     const query = db
       .query(
-        'INSERT INTO buckets (name, read, write, customRead, customWrite, quota, retention, quotaPolicy, retentionPolicy, createdAt, updatedAt) VALUES ($name, $read, $write, $customRead, $customWrite, $quota, $retention, $quotaPolicy, $retentionPolicy, $createdAt, $updatedAt)'
+        `INSERT INTO buckets (
+      name,
+      read,
+      write,
+      customRead,
+      customWrite,
+      quota,
+      retention,
+      quotaPolicy,
+      retentionPolicy,
+      extraHeaders,
+      createdAt,
+      updatedAt
+    ) VALUES (
+      $name,
+      $read,
+      $write,
+      $customRead,
+      $customWrite,
+      $quota,
+      $retention,
+      $quotaPolicy,
+      $retentionPolicy,
+      $extraHeaders,
+      $createdAt,
+      $updatedAt
+    )`
       )
       .as(Bucket);
 
-    const { lastInsertRowid: newBucketId } = query.run({
+    const execQuery = {
       name: bucket.name!,
       read: bucket.read!,
       write: bucket.write!,
@@ -126,9 +170,12 @@ class Bucket implements TBucket {
       retention: bucket.retention!,
       quotaPolicy: bucket.quotaPolicy!,
       retentionPolicy: bucket.retentionPolicy!,
+      extraHeaders: JSON.stringify(bucket.extraHeaders ?? {}),
       createdAt: Date.now(),
       updatedAt: Date.now()
-    });
+    };
+
+    const { lastInsertRowid: newBucketId } = query.run(execQuery);
 
     const bucketPath = Bucket.getPath(bucket.name!);
 
@@ -190,13 +237,14 @@ class Bucket implements TBucket {
         retention = $retention,
         quotaPolicy = $quotaPolicy,
         retentionPolicy = $retentionPolicy,
+        extraHeaders = $extraHeaders,
         updatedAt = $updatedAt
       WHERE id = $id
     `
       )
       .as(Bucket);
 
-    query.run({
+    const execUpdateQuery = {
       name: newData.name ?? existingBucket.name,
       read: newData.read ?? existingBucket.read,
       write: newData.write ?? existingBucket.write,
@@ -207,9 +255,14 @@ class Bucket implements TBucket {
       quotaPolicy: newData.quotaPolicy ?? existingBucket.quotaPolicy,
       retentionPolicy:
         newData.retentionPolicy ?? existingBucket.retentionPolicy,
+      extraHeaders: JSON.stringify(
+        newData.extraHeaders ?? existingBucket.extraHeaders
+      ),
       id: bucketId,
       updatedAt: Date.now()
-    });
+    };
+
+    query.run(execUpdateQuery);
 
     return [true, undefined];
   }

@@ -24,6 +24,7 @@ const ZedBucket = z.object({
   quota: z.number().positive().nullable(),
   retentionPolicy: z.nativeEnum(RetentionPolicy),
   retention: z.number().positive().nullable(),
+  extraHeaders: z.record(z.string()),
   createdAt: z.number().int().positive(),
   updatedAt: z.number().int().positive(),
 });

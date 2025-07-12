@@ -4,9 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 const useForm = (initialValues?: TGenericObject) => {
   const [values, setValues] = useState<TGenericObject>({});
   const [errors, setErrors] = useState<TGenericObject>({});
+  const [isPopulated, setIsPopulated] = useState(false);
 
   const onFieldChange = useCallback(
-    (name: string, value: string | number | boolean) => {
+    (name: string, value: any) => {
       setValues((prev) => ({ ...prev, [name]: value }));
     },
     [setValues]
@@ -58,6 +59,7 @@ const useForm = (initialValues?: TGenericObject) => {
     if (!initialValues) return;
 
     setValues(initialValues);
+    setIsPopulated(true);
   }, [initialValues]);
 
   const formValue = useMemo(
@@ -67,9 +69,10 @@ const useForm = (initialValues?: TGenericObject) => {
       r,
       setErrors,
       rs,
-      onFieldChange
+      onFieldChange,
+      isPopulated
     }),
-    [values, errors, r, setErrors, rs, onFieldChange]
+    [values, errors, r, setErrors, rs, onFieldChange, isPopulated]
   );
 
   return formValue;

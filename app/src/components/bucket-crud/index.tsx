@@ -14,6 +14,7 @@ import {
 import { filesize } from 'filesize';
 import { memo, useCallback, useMemo } from 'react';
 import { CodeEditor } from '../code-editor';
+import { ExtraHeaders } from '../extra-headers';
 import { Button } from '../ui/button';
 import { Group } from '../ui/group';
 import { Input } from '../ui/input';
@@ -39,7 +40,8 @@ const DEFAULT_VALUES: Partial<TZedBucket> = {
   read: IOPermission.PUBLIC,
   write: IOPermission.PRIVATE,
   retentionPolicy: RetentionPolicy.NEVER_DELETE,
-  quotaPolicy: QuotaPolicy.UNLIMITED
+  quotaPolicy: QuotaPolicy.UNLIMITED,
+  extraHeaders: {}
 };
 
 const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
@@ -47,9 +49,8 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
   const isUpdate = useMemo(() => !!bucketId, [bucketId]);
   const isDemoLocked = useIsDemoModeLocked();
 
-  const { r, rs, setErrors, errors, values, onFieldChange } = useForm(
-    bucket ?? DEFAULT_VALUES
-  );
+  const { r, rs, setErrors, errors, values, onFieldChange, isPopulated } =
+    useForm(bucketId ? bucket : DEFAULT_VALUES);
 
   const onSubmitHandler = useCallback(async () => {
     const errors = await onSubmit?.(values);
@@ -59,8 +60,20 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
     }
   }, [onSubmit, values, setErrors]);
 
+  // this this to be memoized to avoid unnecessary re-renders inside ExtraHeaders
+  const onChangeExtraHeaders = useCallback(
+    (value: Record<string, string>) => {
+      onFieldChange('extraHeaders', value);
+    },
+    [onFieldChange]
+  );
+
+  if (!isPopulated) {
+    return null;
+  }
+
   return (
-    <Tabs defaultValue="bucket" className="w-[400px]">
+    <Tabs defaultValue="bucket" className="w-[600px]">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="bucket">Bucket</TabsTrigger>
         <TabsTrigger value="permissions" disabled={!isUpdate}>
@@ -178,7 +191,6 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
               </SelectContent>
             </Select>
           </Group>
-
           {values.retentionPolicy === RetentionPolicy.DISPOSE && (
             <Group
               label="Retention period"
@@ -241,6 +253,16 @@ const BucketCrud = memo(({ bucketId, onSubmit, loading }: TBucketCrudProps) => {
               </span>
             </Group>
           )}
+          <Group
+            label="Extra Headers"
+            error={errors.extraHeaders}
+            description="Extra headers to be added to every response for this specific bucket. This will get merged with the global extra headers defined in the settings."
+          >
+            <ExtraHeaders
+              value={values.extraHeaders}
+              onChange={onChangeExtraHeaders}
+            />
+          </Group>
           <div>
             <Button onClick={onSubmitHandler} disabled={loading}>
               {isUpdate ? 'Save' : 'Create'}

@@ -190,6 +190,8 @@ class Settings {
 
     this.cache[key] = finalValue;
 
+    console.log('! Setting', key, 'to', finalValue);
+
     return query.run({ key, value: this.cache[key] });
   }
 

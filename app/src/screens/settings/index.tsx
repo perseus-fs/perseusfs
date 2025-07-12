@@ -1,4 +1,5 @@
 import { CodeEditor } from '@/components/code-editor';
+import { ExtraHeaders } from '@/components/extra-headers';
 import { LoadingSection } from '@/components/loading-section';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,7 @@ import { useToken } from '@/hooks/use-token';
 import { javascript } from '@codemirror/lang-javascript';
 import { filesize } from 'filesize';
 import { AlertCircle } from 'lucide-react';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import {
   DemoModeHelp,
@@ -32,24 +33,10 @@ const Settings = memo(() => {
   const [loading, setLoading] = useState(false);
   const [changedMaxRequestSize, setChangedMaxRequestSize] = useState(false);
 
-  const parsedSettings = useMemo(() => {
-    return {
-      ...settings,
-      extraHeaders: JSON.stringify(settings?.extraHeaders ?? '{}', null, 2)
-    };
-  }, [settings]);
-
-  const { r, setErrors, errors, values, onFieldChange } =
-    useForm(parsedSettings);
+  const { r, setErrors, errors, values, onFieldChange, isPopulated } =
+    useForm(settings);
 
   const onSubmitHandler = useCallback(async () => {
-    try {
-      JSON.parse(values.extraHeaders);
-    } catch {
-      setErrors({ extraHeaders: 'Invalid JSON' });
-      return;
-    }
-
     if (values.maxRequestSize !== 0 && values.maxRequestSize < 2048) {
       setErrors({
         maxRequestSize:
@@ -69,7 +56,7 @@ const Settings = memo(() => {
       body: JSON.stringify({
         maxRequestSize: values.maxRequestSize,
         corsAllowOrigin: values.corsAllowOrigin,
-        extraHeaders: JSON.parse(values.extraHeaders),
+        extraHeaders: values.extraHeaders,
         extraCode: values.extraCode,
         maxDiskUsage: values.maxDiskUsage,
         demoMode: isSuperUser ? values.demoMode : undefined,
@@ -88,6 +75,24 @@ const Settings = memo(() => {
 
     toast.success('Settings updated successfully');
   }, [token, values, setErrors, isSuperUser]);
+
+  const onChangeExtraHeaders = useCallback(
+    (value: Record<string, string>) => {
+      onFieldChange('extraHeaders', value);
+    },
+    [onFieldChange]
+  );
+
+  const onChangeExtraCode = useCallback(
+    (value: string) => {
+      onFieldChange('extraCode', value);
+    },
+    [onFieldChange]
+  );
+
+  if (!isPopulated) {
+    return null;
+  }
 
   if (loadingData) {
     return <LoadingSection />;
@@ -172,12 +177,9 @@ const Settings = memo(() => {
         description="Extra headers to be added to every response. Must be a valid JSON object"
         help={<ExtraHeadersHelp />}
       >
-        <CodeEditor
-          height="200px"
-          width="1000px"
-          extensions={[javascript()]}
-          onChange={(value) => onFieldChange('extraHeaders', value)}
+        <ExtraHeaders
           value={values.extraHeaders}
+          onChange={onChangeExtraHeaders}
           readOnly={isDemoLocked}
         />
       </Group>
@@ -192,7 +194,7 @@ const Settings = memo(() => {
           height="200px"
           width="1000px"
           extensions={[javascript()]}
-          onChange={(value) => onFieldChange('extraCode', value)}
+          onChange={onChangeExtraCode}
           value={isDemoLocked ? '' : values.extraCode}
           readOnly={isDemoLocked}
         />

@@ -38,7 +38,7 @@ const getFile = async (req: TCustomRequest) => {
   if (!dbFile) {
     return new Response('Not found', {
       status: 404,
-      headers: getResponseHeaders()
+      headers: getResponseHeaders(bucket.extraHeaders)
     });
   }
 
@@ -48,7 +48,7 @@ const getFile = async (req: TCustomRequest) => {
 
     return new Response('Not found', {
       status: 404,
-      headers: getResponseHeaders()
+      headers: getResponseHeaders(bucket.extraHeaders)
     });
   }
 
@@ -63,7 +63,7 @@ const getFile = async (req: TCustomRequest) => {
   if (!(await file.exists())) {
     return new Response('Not found', {
       status: 404,
-      headers: getResponseHeaders()
+      headers: getResponseHeaders(bucket.extraHeaders)
     });
   }
 
@@ -82,14 +82,14 @@ const getFile = async (req: TCustomRequest) => {
         if (!isValid) {
           return new Response('Unauthorized', {
             status: 401,
-            headers: getResponseHeaders()
+            headers: getResponseHeaders(bucket.extraHeaders)
           });
         }
       } else {
         if (!user) {
           return new Response('Unauthorized', {
             status: 401,
-            headers: getResponseHeaders()
+            headers: getResponseHeaders(bucket.extraHeaders)
           });
         }
 
@@ -99,7 +99,7 @@ const getFile = async (req: TCustomRequest) => {
         if (!readPermission) {
           return new Response('Forbidden', {
             status: 403,
-            headers: getResponseHeaders()
+            headers: getResponseHeaders(bucket.extraHeaders)
           });
         }
       }
@@ -114,14 +114,14 @@ const getFile = async (req: TCustomRequest) => {
           if (!customFnResult) {
             return new Response('Forbidden', {
               status: 403,
-              headers: getResponseHeaders()
+              headers: getResponseHeaders(bucket.extraHeaders)
             });
           }
         }
       } catch {
         return new Response('Internal Server Error', {
           status: 500,
-          headers: getResponseHeaders()
+          headers: getResponseHeaders(bucket.extraHeaders)
         });
       }
     }
@@ -129,9 +129,11 @@ const getFile = async (req: TCustomRequest) => {
 
   return new Response(file, {
     headers: {
-      ...getResponseHeaders(),
-      'Cache-Control': 'no-cache',
-      'Content-Type': dbFile?.contentType ?? 'application/octet-stream'
+      ...getResponseHeaders({
+        'Content-Type': dbFile?.contentType ?? 'application/octet-stream',
+        'Cache-Control': 'no-cache',
+        ...bucket.extraHeaders
+      })
     }
   });
 };

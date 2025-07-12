@@ -36,7 +36,10 @@ test('Update bucket', async () => {
     read: IOPermission.PRIVATE,
     write: IOPermission.PRIVATE,
     retention: null,
-    retentionPolicy: RetentionPolicy.NEVER_DELETE
+    retentionPolicy: RetentionPolicy.NEVER_DELETE,
+    extraHeaders: {
+      'X-Custom-Header': 'CustomValue'
+    }
   };
 
   const response = await fetch(`${TestContext.baseUrl}/buckets/${bucketId}`, {
@@ -64,6 +67,7 @@ test('Update bucket', async () => {
   expect(dbBucket?.retentionPolicy).toBe(newData.retentionPolicy!);
   expect(dbBucket?.customRead).toBe(newData.customRead!);
   expect(dbBucket?.customWrite).toBe(newData.customWrite!);
+  expect(dbBucket?.extraHeaders).toEqual(newData.extraHeaders!);
 });
 
 test('No authentication tries to update bucket', async () => {
@@ -104,7 +108,8 @@ test('New bucket data is being validated', async () => {
     quotaPolicy: 'invalid-policy' as QuotaPolicy,
     read: 'invalid-permission' as IOPermission,
     write: 'invalid-permission' as IOPermission,
-    retentionPolicy: 'invalid-policy' as RetentionPolicy
+    retentionPolicy: 'invalid-policy' as RetentionPolicy,
+    extraHeaders: 'i-should-be-an-object' as any
   };
 
   const response = await fetch(`${TestContext.baseUrl}/buckets/${bucketId}`, {
@@ -127,5 +132,6 @@ test('New bucket data is being validated', async () => {
   expect(errors.read).toBeDefined();
   expect(errors.write).toBeDefined();
   expect(errors.retentionPolicy).toBeDefined();
-  expect(Object.keys(errors).length).toBe(6);
+  expect(errors.extraHeaders).toBeDefined();
+  expect(Object.keys(errors).length).toBe(7);
 });

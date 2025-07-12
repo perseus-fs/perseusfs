@@ -16,7 +16,10 @@ const newBucket: Partial<TBucket> = {
   read: IOPermission.PUBLIC,
   write: IOPermission.PUBLIC,
   retention: null,
-  retentionPolicy: RetentionPolicy.NEVER_DELETE
+  retentionPolicy: RetentionPolicy.NEVER_DELETE,
+  extraHeaders: {
+    'X-Custom-Header': 'CustomValue'
+  }
 };
 
 test('Create bucket', async () => {
@@ -75,7 +78,8 @@ test('New bucket data is being validated', async () => {
     read: 'gonna' as IOPermission,
     write: 'give' as IOPermission,
     retention: 'you' as unknown as number,
-    retentionPolicy: 'up' as RetentionPolicy
+    retentionPolicy: 'up' as RetentionPolicy,
+    extraHeaders: 'i-should-be-an-object' as any
   };
 
   const response = await fetch(`${TestContext.baseUrl}/buckets`, {
@@ -99,5 +103,6 @@ test('New bucket data is being validated', async () => {
   expect(errors.quotaPolicy).toBeDefined();
   expect(errors.retention).toBeDefined();
   expect(errors.retentionPolicy).toBeDefined();
-  expect(Object.keys(errors).length).toBe(7);
+  expect(errors.extraHeaders).toBeDefined();
+  expect(Object.keys(errors).length).toBe(8);
 });

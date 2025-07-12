@@ -1,10 +1,16 @@
 import * as migration1 from './1-mock';
+import * as migration2 from './2-add-bucket-headers';
 
 const list = [
   {
     version: 1,
     name: 'mock',
     ref: migration1
+  },
+  {
+    version: 2,
+    name: 'add-bucket-headers',
+    ref: migration2
   }
 ];
 

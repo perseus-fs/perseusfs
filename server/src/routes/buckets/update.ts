@@ -29,7 +29,8 @@ const updateBucket = async (req: TCustomRequest, res: TRes, err: TErr) => {
     quota: body.quota,
     retention: body.retention,
     quotaPolicy: body.quotaPolicy,
-    retentionPolicy: body.retentionPolicy
+    retentionPolicy: body.retentionPolicy,
+    extraHeaders: body.extraHeaders
   });
 
   if (errors) {

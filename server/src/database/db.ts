@@ -23,7 +23,7 @@ import { User } from './models/user';
 // @ts-expect-error any
 import schema from './schema.sql' with { type: 'file' };
 
-const TESTING_IN_MEMORY = true;
+const TEST_IN_MEMORY = true;
 
 export const DATA_PATH = isTesting()
   ? path.join(process.cwd(), '__test_data__')
@@ -31,7 +31,7 @@ export const DATA_PATH = isTesting()
 
 export const BUCKETS_PATH = path.join(DATA_PATH, 'buckets');
 export const DB_PATH =
-  isTesting() && TESTING_IN_MEMORY
+  isTesting() && TEST_IN_MEMORY
     ? ':memory:'
     : path.join(DATA_PATH, 'data.sqlite');
 export const DEFAULT_FILE_CONTENT = 'Hello, World!';
