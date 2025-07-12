@@ -43,7 +43,7 @@ const UpdateBucket = memo(() => {
         return errors;
       }
 
-      toast.success('Bucket created successfully');
+      toast.success('Bucket updated successfully');
       invalidateBucket(bucketId!);
     },
     [token, id, bucketId]
