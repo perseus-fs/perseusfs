@@ -11,7 +11,7 @@
 
   <div>
     <img
-      src="https://img.shields.io/badge/Bun-1.2.8-orange"
+      src="https://img.shields.io/badge/Bun-1.2.18-orange"
       alt="Bun version"
     />
     <img
