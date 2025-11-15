@@ -60,8 +60,6 @@ const server = Bun.serve({
       let response: Response;
 
       if (matchedHandlers) {
-        server.timeout(req, 0);
-
         response = await handleRoute(req, ...matchedHandlers);
       } else {
         response = new Response('Not Found', {
