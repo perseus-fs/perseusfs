@@ -30,49 +30,60 @@ const server = Bun.serve({
   hostname: Settings.hostname,
   maxRequestBodySize:
     maxRequestBodySize === 0 ? Number.MAX_SAFE_INTEGER : maxRequestBodySize,
-  async fetch(req) {
-    const start = performance.now();
-    const url = new URL(req.url);
+  async fetch(req, server) {
+    try {
+      const start = performance.now();
+      const url = new URL(req.url);
 
-    if (req.method === 'OPTIONS') {
-      return new Response(null, { headers: getResponseHeaders() });
-    }
+      if (req.method === 'OPTIONS') {
+        return new Response(null, { headers: getResponseHeaders() });
+      }
 
-    if (url.pathname === '/favicon.ico') {
-      return new Response(null, {
-        status: 404,
-        headers: getResponseHeaders()
-      });
-    }
-
-    if (url.pathname === '/') {
-      return new Response(
-        `Hello from PerseusFS v${Settings.buildInfo.version}`,
-        {
+      if (url.pathname === '/favicon.ico') {
+        return new Response(null, {
+          status: 404,
           headers: getResponseHeaders()
-        }
-      );
-    }
+        });
+      }
 
-    const matchedHandlers = matchRoute(req as TCustomRequest, routes);
+      if (url.pathname === '/') {
+        return new Response(
+          `Hello from PerseusFS v${Settings.buildInfo.version}`,
+          {
+            headers: getResponseHeaders()
+          }
+        );
+      }
 
-    let response: Response;
+      const matchedHandlers = matchRoute(req as TCustomRequest, routes);
 
-    if (matchedHandlers) {
-      response = await handleRoute(req, ...matchedHandlers);
-    } else {
-      response = new Response('Not Found', {
-        status: 404,
+      let response: Response;
+
+      if (matchedHandlers) {
+        server.timeout(req, 0);
+
+        response = await handleRoute(req, ...matchedHandlers);
+      } else {
+        response = new Response('Not Found', {
+          status: 404,
+          headers: getResponseHeaders()
+        });
+      }
+
+      const end = performance.now();
+      const time = end - start;
+
+      logRequest(server, req, response, time);
+
+      return response;
+    } catch (error) {
+      console.error('Unexpected error:', error);
+
+      return new Response('Internal Server Error', {
+        status: 500,
         headers: getResponseHeaders()
       });
     }
-
-    const end = performance.now();
-    const time = end - start;
-
-    logRequest(server, req, response, time);
-
-    return response;
   }
 });
 
